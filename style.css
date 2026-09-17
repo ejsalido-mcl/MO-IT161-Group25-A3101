@@ -3,7 +3,7 @@
    Stylesheet
    ============================================ */
 
-
+/* ===== Base Styles & Typography ===== */
 * {
     box-sizing: border-box;
 }
@@ -17,7 +17,7 @@ body {
     padding: 0;
 }
 
-
+/* ===== Layout Container ===== */
 body > * {
     max-width: 900px;
     margin-left: auto;
@@ -31,7 +31,7 @@ header, nav, main, footer {
     padding-bottom: 24px;
 }
 
-
+/* ===== Header Refinement ===== */
 header {
     padding-top: 48px;
     padding-bottom: 32px;
@@ -50,4 +50,45 @@ header p {
     font-size: 16px;
     color: #64748b;
     margin: 0;
+}
+
+/* ===== Navigation ===== */
+
+nav {
+    display: flex;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: #475569;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+nav a:hover {
+    color: #0f172a;
+}
+
+/* ===== Section Structure ===== */
+
+section {
+    padding: 32px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+section h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: #0f172a;
+}
+
+section p {
+    color: #475569;
+    margin: 0 0 16px 0;
 }
