@@ -92,3 +92,61 @@ section p {
     color: #475569;
     margin: 0 0 16px 0;
 }
+
+/* ===== Form Inputs ===== */
+
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    margin-top: 20px;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #0f172a;
+}
+
+input[type="radio"] {
+    margin-right: 6px;
+}
+
+/* ===== Buttons ===== */
+
+button {
+    background-color: #0f172a;
+    color: #ffffff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.15s ease;
+}
+
+button:hover {
+    background-color: #1e293b;
+}
