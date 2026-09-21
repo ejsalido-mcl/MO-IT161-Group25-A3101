@@ -1,23 +1,30 @@
 /* ============================================
    NetGuard — Security Assessment Tool
-   Stylesheet
+   Theme: Black / Green / Blue
+   Fonts: Montserrat, Archivo Black
    ============================================ */
 
-/* ===== Base Styles & Typography ===== */
+/* ===== GOOGLE FONTS IMPORT ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* ===== BASE STYLES ===== */
+
 * {
     box-sizing: border-box;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     line-height: 1.6;
-    color: #1e293b;
-    background-color: #f8fafc;
+    color: #e5e7eb;
+    background-color: #0a0a0a;
     margin: 0;
     padding: 0;
 }
 
-/* ===== Layout Container ===== */
+/* ===== LAYOUT CONTAINER ===== */
+
 body > * {
     max-width: 900px;
     margin-left: auto;
@@ -31,39 +38,41 @@ header, nav, main, footer {
     padding-bottom: 24px;
 }
 
-/* ===== Header Refinement ===== */
+/* ===== HEADER ===== */
+
 header {
     padding-top: 48px;
     padding-bottom: 32px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #1f2937;
 }
 
 header h1 {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 36px;
+    font-weight: 400;
     letter-spacing: -0.5px;
     margin: 0 0 8px 0;
-    color: #0f172a;
+    color: #22c55e;
 }
 
 header p {
     font-size: 16px;
-    color: #64748b;
+    color: #9ca3af;
     margin: 0;
 }
 
-/* ===== Navigation ===== */
+/* ===== NAVIGATION ===== */
 
 nav {
     display: flex;
     gap: 24px;
     padding: 16px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #1f2937;
     flex-wrap: wrap;
 }
 
 nav a {
-    color: #475569;
+    color: #9ca3af;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
@@ -71,35 +80,47 @@ nav a {
 }
 
 nav a:hover {
-    color: #0f172a;
+    color: #22c55e;
 }
 
-/* ===== Section Structure ===== */
+/* ===== SECTIONS ===== */
 
 section {
     padding: 32px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #1f2937;
 }
 
 section h2 {
-    font-size: 22px;
-    font-weight: 600;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 24px;
+    font-weight: 400;
     margin: 0 0 16px 0;
-    color: #0f172a;
+    color: #22c55e;
 }
 
 section p {
-    color: #475569;
+    color: #d1d5db;
     margin: 0 0 16px 0;
 }
 
-/* ===== Form Inputs ===== */
+/* ===== LINKS ===== */
+
+a {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== FORM INPUTS ===== */
 
 label {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #334155;
+    color: #e5e7eb;
     margin-top: 20px;
     margin-bottom: 6px;
 }
@@ -113,75 +134,82 @@ textarea {
     width: 100%;
     max-width: 420px;
     padding: 10px 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #374151;
     border-radius: 6px;
     font-size: 14px;
-    font-family: inherit;
-    background-color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #111827;
+    color: #e5e7eb;
     transition: border-color 0.15s ease;
 }
 
 input:focus,
 textarea:focus {
     outline: none;
-    border-color: #0f172a;
+    border-color: #22c55e;
 }
 
 input[type="radio"] {
     margin-right: 6px;
+    accent-color: #22c55e;
 }
 
-/* ===== Buttons ===== */
+/* ===== BUTTONS ===== */
 
 button {
-    background-color: #0f172a;
-    color: #ffffff;
+    background-color: #22c55e;
+    color: #0a0a0a;
     padding: 12px 24px;
     border: none;
     border-radius: 6px;
     font-size: 14px;
-    font-weight: 500;
-    font-family: inherit;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
     cursor: pointer;
     margin-top: 20px;
     transition: background-color 0.15s ease;
 }
 
 button:hover {
-    background-color: #1e293b;
+    background-color: #16a34a;
 }
 
-/* ===== Aside and Footer ===== */
+/* ===== ASIDE ===== */
 
 aside {
     padding: 24px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #1f2937;
 }
 
 aside h3 {
+    font-family: 'Archivo Black', sans-serif;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 400;
     margin: 0 0 12px 0;
-    color: #0f172a;
+    color: #22c55e;
 }
+
+/* ===== FOOTER ===== */
 
 footer {
     padding: 32px 0;
     font-size: 13px;
-    color: #94a3b8;
+    color: #6b7280;
     text-align: center;
 }
 
-/* ===== Lists & Images ===== */
+/* ===== LISTS ===== */
 
 ul, ol {
     padding-left: 20px;
-    color: #475569;
+    color: #d1d5db;
 }
 
 li {
     margin-bottom: 6px;
 }
+
+/* ===== IMAGES ===== */
 
 img {
     max-width: 100%;
@@ -189,4 +217,46 @@ img {
     border-radius: 8px;
     margin: 16px 0;
     display: block;
+}
+
+/* ===== RESULTS BOX ===== */
+
+.result-box {
+    background-color: #111827;
+    border-left: 4px solid #22c55e;
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 16px;
+}
+
+.result-box h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 400;
+    color: #22c55e;
+    margin: 0 0 8px 0;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 640px) {
+    header h1 {
+        font-size: 28px;
+    }
+
+    nav {
+        gap: 16px;
+    }
+
+    section {
+        padding: 24px 0;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    textarea {
+        max-width: 100%;
+    }
 }
