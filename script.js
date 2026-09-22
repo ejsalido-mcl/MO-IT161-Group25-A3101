@@ -123,3 +123,30 @@ function showResults(riskLevel, checklist, safeAnswers) {
     // Scroll to results
     resultBox.scrollIntoView({ behavior: "smooth" });
 }
+
+// ===== CONTACT FORM =====
+
+const contactForm = document.getElementById("contact-form");
+
+if (contactForm) {
+    contactForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const name = contactForm.querySelector('input[type="text"]').value.trim();
+        const email = contactForm.querySelector('input[type="email"]').value.trim();
+        const message = contactForm.querySelector("textarea").value.trim();
+
+        if (!name || !email || !message) {
+            alert("Please fill in all fields before sending.");
+            return;
+        }
+
+        // Show success message
+        document.getElementById("contact-message").style.display = "block";
+
+        // Clear the form
+        contactForm.reset();
+
+        console.log("Contact form submitted:", { name, email, message });
+    });
+}
