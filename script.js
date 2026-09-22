@@ -2,13 +2,42 @@
    NetGuard — JavaScript
    ============================================ */
 
+
 console.log("NetGuard script loaded.");
+
+// ===== SAVE/RESTORE ASSESSMENT ANSWERS =====
+
+function saveAnswers() {
+    const answers = {};
+    for (let i = 1; i <= 10; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected) answers[`q${i}`] = selected.value;
+    }
+    localStorage.setItem("netguard-answers", JSON.stringify(answers));
+}
+
+function restoreAnswers() {
+    const saved = localStorage.getItem("netguard-answers");
+    if (!saved) return;
+
+    const answers = JSON.parse(saved);
+    for (const key in answers) {
+        const input = document.querySelector(`input[name="${key}"][value="${answers[key]}"]`);
+        if (input) input.checked = true;
+    }
+}
 
 // ===== ASSESSMENT FORM =====
 
 const assessmentForm = document.querySelector("form");
 
 if (assessmentForm) {
+       // Restore answers when page loads
+    restoreAnswers();
+
+    // Save answers whenever a radio is clicked
+    assessmentForm.addEventListener("change", saveAnswers); 
+    
     assessmentForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -123,3 +152,17 @@ function showResults(riskLevel, checklist, safeAnswers) {
     // Scroll to results
     resultBox.scrollIntoView({ behavior: "smooth" });
 }
+
+// ===== ACTIVE NAV HIGHLIGHT =====
+
+const currentPage = window.location.pathname.split("/").pop() || "index.html";
+const navLinks = document.querySelectorAll("nav a");
+
+navLinks.forEach((link) => {
+    if (link.getAttribute("href") === currentPage) {
+        link.classList.add("active");
+    }
+});
+
+
+

@@ -204,3 +204,10 @@ img {
 .risk-high {
     color: #ef4444;
 }
+
+/* ===== Active Navigation ===== */
+
+nav a.active {
+    color: #22c55e;
+    font-weight: 700;
+}
