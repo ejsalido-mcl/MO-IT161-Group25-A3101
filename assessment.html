@@ -71,13 +71,16 @@
             </form>
         </section>
 
-        <section class="results-section">
+        <section class="results-section" id="results">
             <h2>Your Results</h2>
-            <p><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
+            <p id="results-placeholder"><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
 
-            <div class="result-box">
-                <h3>Risk Level: —</h3>
-                <p>Complete the assessment above to see your score.</p>
+            <div class="result-box" id="result-box" style="display: none;">
+                <h3 id="risk-level">Risk Level: —</h3>
+                <p id="risk-summary">—</p>
+
+                <h4>Recommended Fixes</h4>
+                <ul id="checklist"></ul>
             </div>
         </section>
 

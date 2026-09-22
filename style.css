@@ -190,3 +190,17 @@ img {
     margin: 16px 0;
     display: block;
 }
+
+/* ===== Risk Level Colors ===== */
+
+.risk-low {
+    color: #22c55e;
+}
+
+.risk-medium {
+    color: #eab308;
+}
+
+.risk-high {
+    color: #ef4444;
+}

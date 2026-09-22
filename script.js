@@ -4,7 +4,7 @@
 
 console.log("NetGuard script loaded.");
 
-// ===== FORM VALIDATION + RISK CALCULATION =====
+// ===== ASSESSMENT FORM =====
 
 const assessmentForm = document.querySelector("form");
 
@@ -17,14 +17,11 @@ if (assessmentForm) {
         let missing = [];
         let safeAnswers = 0;
 
-        // Questions where "yes" is the safe answer
         const safeYesQuestions = [1, 4, 5, 6, 7, 8, 9, 10];
-        // Questions where "no" is the safe answer
         const safeNoQuestions = [2, 3];
 
         for (let i = 1; i <= totalQuestions; i++) {
             const selected = document.querySelector(`input[name="q${i}"]:checked`);
-
             if (!selected) {
                 missing.push(i);
             } else {
@@ -38,7 +35,6 @@ if (assessmentForm) {
             return;
         }
 
-        // Count safe answers
         safeYesQuestions.forEach((q) => {
             const selected = document.querySelector(`input[name="q${q}"]:checked`);
             if (selected && selected.value === "yes") safeAnswers++;
@@ -59,7 +55,71 @@ if (assessmentForm) {
             riskLevel = "High";
         }
 
-        console.log("Safe answers:", safeAnswers);
-        console.log("Risk level:", riskLevel);
+        // Build checklist based on unsafe answers
+        const checklist = [];
+
+        if (!isSafe(1, "yes")) checklist.push("Use a stronger, unique Wi-Fi password.");
+        if (!isSafe(2, "no")) checklist.push("Limit who knows your Wi-Fi password.");
+        if (!isSafe(3, "no")) checklist.push("Change your router's default admin password.");
+        if (!isSafe(4, "yes")) checklist.push("Update your router's firmware regularly.");
+        if (!isSafe(5, "yes")) checklist.push("Enable WPA2 or WPA3 encryption.");
+        if (!isSafe(6, "yes")) checklist.push("Consider hiding your Wi-Fi network name (SSID).");
+        if (!isSafe(7, "yes")) checklist.push("Set up a separate guest network for visitors.");
+        if (!isSafe(8, "yes")) checklist.push("Regularly check who is connected to your network.");
+        if (!isSafe(9, "yes")) checklist.push("Place your router in a secure location.");
+        if (!isSafe(10, "yes")) checklist.push("Enable a firewall on your network.");
+
+        // Show results
+        showResults(riskLevel, checklist, safeAnswers);
     });
+}
+
+// ===== HELPER: Check if a question was answered safely =====
+
+function isSafe(questionNumber, safeValue) {
+    const selected = document.querySelector(`input[name="q${questionNumber}"]:checked`);
+    return selected && selected.value === safeValue;
+}
+
+// ===== DISPLAY RESULTS =====
+
+function showResults(riskLevel, checklist, safeAnswers) {
+    const placeholder = document.getElementById("results-placeholder");
+    const resultBox = document.getElementById("result-box");
+    const riskLevelEl = document.getElementById("risk-level");
+    const riskSummary = document.getElementById("risk-summary");
+    const checklistEl = document.getElementById("checklist");
+
+    // Hide placeholder, show result box
+    placeholder.style.display = "none";
+    resultBox.style.display = "block";
+
+    // Set risk level text
+    riskLevelEl.textContent = `Risk Level: ${riskLevel}`;
+    riskLevelEl.className = "";
+    riskLevelEl.classList.add(`risk-${riskLevel.toLowerCase()}`);
+
+    // Set summary
+    if (riskLevel === "Low") {
+        riskSummary.textContent = `You scored ${safeAnswers}/10. Your Wi-Fi setup is fairly secure.`;
+    } else if (riskLevel === "Medium") {
+        riskSummary.textContent = `You scored ${safeAnswers}/10. Some settings could be improved.`;
+    } else {
+        riskSummary.textContent = `You scored ${safeAnswers}/10. Your network may be vulnerable.`;
+    }
+
+    // Build checklist
+    checklistEl.innerHTML = "";
+    if (checklist.length === 0) {
+        checklistEl.innerHTML = "<li>Nothing to fix — your setup looks great!</li>";
+    } else {
+        checklist.forEach((item) => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            checklistEl.appendChild(li);
+        });
+    }
+
+    // Scroll to results
+    resultBox.scrollIntoView({ behavior: "smooth" });
 }
