@@ -234,6 +234,61 @@ main p, main li {
   margin-left: 10px;
 }
 
+section {
+    padding: 32px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+section h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    color: #0f172a;
+}
+
+section p {
+    color: #475569;
+    margin: 0 0 16px 0;
+}
+
+/* ===== Form Inputs ===== */
+
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    margin-top: 20px;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #0f172a;
+}
+
+input[type="radio"] {
+    margin-right: 6px;
+}
+
 footer {
     padding: 32px 0;
     font-size: 13px;
@@ -241,3 +296,62 @@ footer {
     text-align: right;
 }
 
+
+aside {
+    padding: 24px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+aside h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: #0f172a;
+}
+
+footer {
+    padding: 32px 0;
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ===== Lists & Images ===== */
+
+ul, ol {
+    padding-left: 20px;
+    color: #475569;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 16px 0;
+    display: block;
+}
+
+/* ===== Risk Level Colors ===== */
+
+.risk-low {
+    color: #22c55e;
+}
+
+.risk-medium {
+    color: #eab308;
+}
+
+.risk-high {
+    color: #ef4444;
+}
+
+/* ===== Active Navigation ===== */
+
+nav a.active {
+    color: #22c55e;
+    font-weight: 700;
+}

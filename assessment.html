@@ -6,7 +6,7 @@
     <link rel="icon" type="image/x-icon" href="images/Netguard Logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
-    <script src="carousel.js" defer></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
@@ -74,15 +74,14 @@
         </section>
 
         <section class="results-section">
-            <h2>Your Results</h2>
-            <p><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
+             <h2>Your Results</h2>
+                <p id="results-placeholder"><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
 
-            <div class="result-box">
-                <h3>Risk Level: —</h3>
-                <p>Complete the assessment above to see your score.</p>
-            </div>
+            <div id="result-box" style="display:none;">
+                <h3 id="risk-level">Risk Level: -</h3>
+                <p id="risk-summary">Complete the assessment above to see your score.</p>
+                <ul id="checklist"></ul>
         </section>
-
     </main>
 
     <footer>
