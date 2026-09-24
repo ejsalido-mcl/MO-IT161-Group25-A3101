@@ -3,20 +3,23 @@
 <head>
     <title>NetGuard – Start Assessment</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="images/Netguard Logo.png">
 </head>
 <body>
 
     <header>
+        <div class="WebsiteLogo">
+            <img src="images/Netguard Logo.png" alt="NetGuard Logo">
+        </div>
         <h1>NetGuard</h1>
         <p>Check your Wi-Fi security in just a few minutes.</p>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="assessment.html">Start Assessment</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
     </header>
-
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="assessment.html">Start Assessment</a>
-        <a href="about.html">About Us</a>
-        <a href="contact.html">Contact Us</a>
-    </nav>
 
     <main>
 
@@ -66,7 +69,8 @@
                 <input type="radio" name="q10" value="yes"> Yes
                 <input type="radio" name="q10" value="no"> No
 
-                <button>Calculate My Risk Score</button>
+                <button type="submit">Calculate My Risk Score</button>
+                <button type="button" id="reset-btn" class="btn-secondary">Reset</button>
 
             </form>
         </section>
@@ -90,6 +94,7 @@
         <p>Contact: support@netguard.com</p>
         <p>&copy; 2026 NetGuard. All rights reserved.</p>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>

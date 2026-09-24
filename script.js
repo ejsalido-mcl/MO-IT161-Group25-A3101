@@ -2,7 +2,6 @@
    NetGuard — JavaScript
    ============================================ */
 
-
 console.log("NetGuard script loaded.");
 
 // ===== SAVE/RESTORE ASSESSMENT ANSWERS =====
@@ -32,14 +31,21 @@ function restoreAnswers() {
 const assessmentForm = document.querySelector("form");
 
 if (assessmentForm) {
-       // Restore answers when page loads
     restoreAnswers();
+    assessmentForm.addEventListener("change", saveAnswers);
 
-    // Save answers whenever a radio is clicked
-    assessmentForm.addEventListener("change", saveAnswers); 
-    
     assessmentForm.addEventListener("submit", function (event) {
         event.preventDefault();
+
+        const submitBtn = assessmentForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.textContent = "Calculating...";
+            submitBtn.disabled = true;
+            setTimeout(() => {
+                submitBtn.textContent = "Calculate My Risk Score";
+                submitBtn.disabled = false;
+            }, 600);
+        }
 
         const totalQuestions = 10;
         let answered = 0;
@@ -51,11 +57,8 @@ if (assessmentForm) {
 
         for (let i = 1; i <= totalQuestions; i++) {
             const selected = document.querySelector(`input[name="q${i}"]:checked`);
-            if (!selected) {
-                missing.push(i);
-            } else {
-                answered++;
-            }
+            if (!selected) missing.push(i);
+            else answered++;
         }
 
         if (answered < totalQuestions) {
@@ -74,19 +77,12 @@ if (assessmentForm) {
             if (selected && selected.value === "no") safeAnswers++;
         });
 
-        // Determine risk level
         let riskLevel;
-        if (safeAnswers >= 8) {
-            riskLevel = "Low";
-        } else if (safeAnswers >= 5) {
-            riskLevel = "Medium";
-        } else {
-            riskLevel = "High";
-        }
+        if (safeAnswers >= 8) riskLevel = "Low";
+        else if (safeAnswers >= 5) riskLevel = "Medium";
+        else riskLevel = "High";
 
-        // Build checklist based on unsafe answers
         const checklist = [];
-
         if (!isSafe(1, "yes")) checklist.push("Use a stronger, unique Wi-Fi password.");
         if (!isSafe(2, "no")) checklist.push("Limit who knows your Wi-Fi password.");
         if (!isSafe(3, "no")) checklist.push("Change your router's default admin password.");
@@ -98,9 +94,24 @@ if (assessmentForm) {
         if (!isSafe(9, "yes")) checklist.push("Place your router in a secure location.");
         if (!isSafe(10, "yes")) checklist.push("Enable a firewall on your network.");
 
-        // Show results
         showResults(riskLevel, checklist, safeAnswers);
     });
+
+    // Reset button
+    const resetBtn = document.getElementById("reset-btn");
+    if (resetBtn) {
+        resetBtn.addEventListener("click", function () {
+            assessmentForm.reset();
+            localStorage.removeItem("netguard-answers");
+
+            const placeholder = document.getElementById("results-placeholder");
+            const resultBox = document.getElementById("result-box");
+            if (placeholder) placeholder.style.display = "block";
+            if (resultBox) resultBox.style.display = "none";
+
+            console.log("Assessment reset.");
+        });
+    }
 }
 
 // ===== HELPER: Check if a question was answered safely =====
@@ -119,16 +130,15 @@ function showResults(riskLevel, checklist, safeAnswers) {
     const riskSummary = document.getElementById("risk-summary");
     const checklistEl = document.getElementById("checklist");
 
-    // Hide placeholder, show result box
+    if (!placeholder || !resultBox) return;
+
     placeholder.style.display = "none";
     resultBox.style.display = "block";
 
-    // Set risk level text
     riskLevelEl.textContent = `Risk Level: ${riskLevel}`;
     riskLevelEl.className = "";
     riskLevelEl.classList.add(`risk-${riskLevel.toLowerCase()}`);
 
-    // Set summary
     if (riskLevel === "Low") {
         riskSummary.textContent = `You scored ${safeAnswers}/10. Your Wi-Fi setup is fairly secure.`;
     } else if (riskLevel === "Medium") {
@@ -137,7 +147,6 @@ function showResults(riskLevel, checklist, safeAnswers) {
         riskSummary.textContent = `You scored ${safeAnswers}/10. Your network may be vulnerable.`;
     }
 
-    // Build checklist
     checklistEl.innerHTML = "";
     if (checklist.length === 0) {
         checklistEl.innerHTML = "<li>Nothing to fix — your setup looks great!</li>";
@@ -149,8 +158,32 @@ function showResults(riskLevel, checklist, safeAnswers) {
         });
     }
 
-    // Scroll to results
     resultBox.scrollIntoView({ behavior: "smooth" });
+}
+
+// ===== CONTACT FORM =====
+
+const contactForm = document.getElementById("contact-form");
+
+if (contactForm) {
+    contactForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const name = contactForm.querySelector('input[type="text"]').value.trim();
+        const email = contactForm.querySelector('input[type="email"]').value.trim();
+        const message = contactForm.querySelector("textarea").value.trim();
+
+        if (!name || !email || !message) {
+            alert("Please fill in all fields before sending.");
+            return;
+        }
+
+        const msg = document.getElementById("contact-message");
+        if (msg) msg.style.display = "block";
+
+        contactForm.reset();
+        console.log("Contact form submitted:", { name, email, message });
+    });
 }
 
 // ===== ACTIVE NAV HIGHLIGHT =====
@@ -164,5 +197,21 @@ navLinks.forEach((link) => {
     }
 });
 
+// ===== CAROUSEL =====
 
+const prevBtn = document.querySelector(".carousel-btn.prev");
+const nextBtn = document.querySelector(".carousel-btn.next");
+const carouselContainer = document.querySelector(".carousel-container");
 
+if (prevBtn && nextBtn && carouselContainer) {
+    const card = carouselContainer.querySelector(".card");
+    const cardWidth = card.offsetWidth + 20;
+
+    prevBtn.addEventListener("click", () => {
+        carouselContainer.scrollBy({ left: -cardWidth, behavior: "smooth" });
+    });
+
+    nextBtn.addEventListener("click", () => {
+        carouselContainer.scrollBy({ left: cardWidth, behavior: "smooth" });
+    });
+}
