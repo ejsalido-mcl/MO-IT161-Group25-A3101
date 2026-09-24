@@ -140,7 +140,7 @@ function showResults(riskLevel, checklist, safeAnswers) {
     // Build checklist
     checklistEl.innerHTML = "";
     if (checklist.length === 0) {
-        checklistEl.innerHTML = "<li>Nothing to fix — your setup looks great!</li>";
+        checklistEl.innerHTML = "<li>Nothing to fix - your setup looks great!</li>";
     } else {
         checklist.forEach((item) => {
             const li = document.createElement("li");
