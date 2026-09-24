@@ -2,191 +2,242 @@
    NetGuard — Security Assessment Tool
    Stylesheet
    ============================================ */
-
+   
 /* ===== Base Styles & Typography ===== */
+
 * {
     box-sizing: border-box;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.6;
-    color: #1e293b;
-    background-color: #f8fafc;
+html {
+    scroll-behavior: smooth;
+}
+
+/* ===== Header Styles ===== */
+Header {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    Align-Items: center;
+    gap: 0;
+    position: sticky;
+}
+
+.WebsiteLogo {
+    max-width: 300px;
     margin: 0;
-    padding: 0;
+    padding-top: 50px;
 }
 
-/* ===== Layout Container ===== */
-body > * {
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 24px;
-    padding-right: 24px;
+.WebsiteLogo img{
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin-bottom: 8px;
 }
 
-header, nav, main, footer {
-    padding-top: 24px;
-    padding-bottom: 24px;
-}
-
-/* ===== Header Refinement ===== */
-header {
-    padding-top: 48px;
-    padding-bottom: 32px;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-header h1 {
+header h1{
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    justify-content: center; 
     font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    margin: 0 0 8px 0;
-    color: #0f172a;
 }
-
-header p {
-    font-size: 16px;
-    color: #64748b;
-    margin: 0;
-}
-
-/* ===== Navigation ===== */
 
 nav {
+    padding-top: 10px;
+    padding-bottom: 5px;
+    gap: 20px;
     display: flex;
-    gap: 24px;
-    padding: 16px 0;
-    border-bottom: 1px solid #e2e8f0;
+    font-size: 18px;
+    font-weight: 500;
     flex-wrap: wrap;
+    border-bottom: 1px solid #085af1;
+    font-family: 'Raleway', sans-serif;
 }
 
 nav a {
-    color: #475569;
+    color: #1984c2;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
     transition: color 0.15s ease;
 }
 
 nav a:hover {
-    color: #0f172a;
+    color:#32CD32;
 }
 
-/* ===== Section Structure ===== */
+/* ===== Main Styles ===== */
 
-section {
-    padding: 32px 0;
-    border-bottom: 1px solid #e2e8f0;
+body {
+    background-color: #f8f8f8;
 }
 
-section h2 {
-    font-size: 22px;
+main {
+    padding: 40px 20px;
+    font-family: 'Raleway', sans-serif;
+    color: #333;
+    max-width: 1000px;
+    margin: 0 auto;     
+    text-align: center;   
+}
+
+
+main h2 {
+    font-size: 24px;
     font-weight: 600;
-    margin: 0 0 16px 0;
-    color: #0f172a;
+    color: #000000;
+    display: inline-block;
 }
 
-section p {
-    color: #475569;
-    margin: 0 0 16px 0;
+
+main p, main li {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 12px;
 }
 
-/* ===== Form Inputs ===== */
-
-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #334155;
-    margin-top: 20px;
-    margin-bottom: 6px;
+.Assesment {
+    display: flex;          
+    flex-direction: column;     
+    align-items: center;        
+    justify-content: center;    
+    margin: 60px auto;
+    padding: 40px 20px;
+    border-radius: 8px;
+    max-width: 700px;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-textarea {
-    width: 100%;
-    max-width: 420px;
-    padding: 10px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: inherit;
-    background-color: #ffffff;
-    transition: border-color 0.15s ease;
+.Assesment h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
-input:focus,
-textarea:focus {
-    outline: none;
-    border-color: #0f172a;
-}
-
-input[type="radio"] {
-    margin-right: 6px;
-}
-
-/* ===== Buttons ===== */
-
-button {
-    background-color: #0f172a;
-    color: #ffffff;
-    padding: 12px 24px;
+.Assesment button {
+    background-color: #1984c2;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 14px 32px;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: inherit;
     cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.15s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-button:hover {
-    background-color: #1e293b;
+.Assesment button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 
-/* ===== Aside and Footer ===== */
-
-aside {
-    padding: 24px 0;
-    border-bottom: 1px solid #e2e8f0;
+.Introduction p{
+    margin-top: 0;
+    padding-bottom: 20px;
+}
+.Introduction2 ol {
+    list-style-position: inside; 
+    padding: 0;                    
+    margin: 0 auto;                
+    text-align: center;           
+    max-width: 600px;              
 }
 
-aside h3 {
+.Introduction2 li {
     font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
-    color: #0f172a;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.carousel {
+  text-align: center;
+  margin: 60px auto;
+  max-width: 1000px;
+  font-family: 'Raleway', sans-serif;
+}
+
+.carousel h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1984c2;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f14a08;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-container {
+  display: flex;
+  gap: 20px;
+  overflow-x: hidden; /* hide scroll bar */
+  scroll-behavior: smooth;
+  padding: 20px 0;
+}
+
+.card {
+  flex: 0 0 250px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  text-align: left;
+}
+
+.card h3 {
+  font-size: 18px;
+  color: #f14a08;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.card a {
+  color: #1984c2;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+
+/* Arrow buttons */
+.carousel-btn {
+  background: #1984c2;
+  color: #fff;
+  border: none;
+  font-size: 24px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.carousel-btn:hover {
+  background: #f14a08;
+}
+
+.carousel-btn.prev {
+  margin-right: 10px;
+}
+
+.carousel-btn.next {
+  margin-left: 10px;
 }
 
 footer {
     padding: 32px 0;
     font-size: 13px;
     color: #94a3b8;
-    text-align: center;
+    text-align: right;
 }
 
-/* ===== Lists & Images ===== */
-
-ul, ol {
-    padding-left: 20px;
-    color: #475569;
-}
-
-li {
-    margin-bottom: 6px;
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 16px 0;
-    display: block;
-}
