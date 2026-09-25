@@ -4,6 +4,12 @@
 
 console.log("NetGuard script loaded.");
 
+// ===== FOOTER YEAR =====
+
+document.querySelectorAll("#year").forEach((el) => {
+    el.textContent = new Date().getFullYear();
+});
+
 // ===== SAVE/RESTORE ASSESSMENT ANSWERS =====
 
 function saveAnswers() {
@@ -17,22 +23,51 @@ function saveAnswers() {
 
 function restoreAnswers() {
     const saved = localStorage.getItem("netguard-answers");
-    if (!saved) return;
+    if (!saved) return false;
 
     const answers = JSON.parse(saved);
+    if (Object.keys(answers).length === 0) return false;
+
     for (const key in answers) {
         const input = document.querySelector(`input[name="${key}"][value="${answers[key]}"]`);
         if (input) input.checked = true;
     }
+    return true;
+}
+
+// ===== PROGRESS INDICATOR =====
+
+function updateProgress() {
+    const statusEl = document.getElementById("progress-status");
+    const fillEl = document.getElementById("progress-fill");
+    if (!statusEl || !fillEl) return;
+
+    let answered = 0;
+    for (let i = 1; i <= 10; i++) {
+        if (document.querySelector(`input[name="q${i}"]:checked`)) answered++;
+    }
+
+    statusEl.textContent = `${answered} of 10 questions answered`;
+    fillEl.style.width = `${(answered / 10) * 100}%`;
 }
 
 // ===== ASSESSMENT FORM =====
 
-const assessmentForm = document.querySelector("form");
+const assessmentForm = document.getElementById("assessment-form");
 
 if (assessmentForm) {
-    restoreAnswers();
-    assessmentForm.addEventListener("change", saveAnswers);
+    const wasRestored = restoreAnswers();
+    updateProgress();
+
+    const restoreBanner = document.getElementById("restore-banner");
+    if (restoreBanner && wasRestored) {
+        restoreBanner.hidden = false;
+    }
+
+    assessmentForm.addEventListener("change", function () {
+        saveAnswers();
+        updateProgress();
+    });
 
     assessmentForm.addEventListener("submit", function (event) {
         event.preventDefault();
@@ -44,28 +79,59 @@ if (assessmentForm) {
             setTimeout(() => {
                 submitBtn.textContent = "Calculate My Risk Score";
                 submitBtn.disabled = false;
-            }, 600);
+            }, 500);
         }
 
         const totalQuestions = 10;
-        let answered = 0;
         let missing = [];
         let safeAnswers = 0;
 
         const safeYesQuestions = [1, 4, 5, 6, 7, 8, 9, 10];
         const safeNoQuestions = [2, 3];
 
+        // Clear previous error states
+        document.querySelectorAll("fieldset").forEach((fs) => fs.classList.remove("fieldset-error"));
+
         for (let i = 1; i <= totalQuestions; i++) {
             const selected = document.querySelector(`input[name="q${i}"]:checked`);
-            if (!selected) missing.push(i);
-            else answered++;
+            if (!selected) {
+                missing.push(i);
+                const fs = document.getElementById(`fieldset-q${i}`);
+                if (fs) fs.classList.add("fieldset-error");
+            }
         }
 
-        if (answered < totalQuestions) {
-            alert("Please answer all questions before submitting.");
+        const errorSummary = document.getElementById("error-summary");
+        const errorList = document.getElementById("error-list");
+
+        if (missing.length > 0) {
+            if (errorSummary && errorList) {
+                errorList.innerHTML = "";
+                missing.forEach((q) => {
+                    const li = document.createElement("li");
+                    const link = document.createElement("a");
+                    link.href = `#fieldset-q${q}`;
+                    link.textContent = `Question ${q}`;
+                    link.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        const target = document.getElementById(`fieldset-q${q}`);
+                        if (target) {
+                            target.setAttribute("tabindex", "-1");
+                            target.scrollIntoView({ behavior: "smooth", block: "center" });
+                            target.focus();
+                        }
+                    });
+                    li.appendChild(link);
+                    errorList.appendChild(li);
+                });
+                errorSummary.classList.add("show");
+                errorSummary.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
             console.log("Missing questions:", missing);
             return;
         }
+
+        if (errorSummary) errorSummary.classList.remove("show");
 
         safeYesQuestions.forEach((q) => {
             const selected = document.querySelector(`input[name="q${q}"]:checked`);
@@ -103,6 +169,14 @@ if (assessmentForm) {
         resetBtn.addEventListener("click", function () {
             assessmentForm.reset();
             localStorage.removeItem("netguard-answers");
+            updateProgress();
+
+            document.querySelectorAll("fieldset").forEach((fs) => fs.classList.remove("fieldset-error"));
+            const errorSummary = document.getElementById("error-summary");
+            if (errorSummary) errorSummary.classList.remove("show");
+
+            const restoreBanner = document.getElementById("restore-banner");
+            if (restoreBanner) restoreBanner.hidden = true;
 
             const placeholder = document.getElementById("results-placeholder");
             const resultBox = document.getElementById("result-box");
@@ -158,6 +232,7 @@ function showResults(riskLevel, checklist, safeAnswers) {
         });
     }
 
+    resultBox.focus();
     resultBox.scrollIntoView({ behavior: "smooth" });
 }
 
@@ -166,36 +241,78 @@ function showResults(riskLevel, checklist, safeAnswers) {
 const contactForm = document.getElementById("contact-form");
 
 if (contactForm) {
+    const nameInput = document.getElementById("contact-name");
+    const emailInput = document.getElementById("contact-email");
+    const messageInput = document.getElementById("contact-message-input");
+
+    function validateField(input, errorId, isValid) {
+        const errorEl = document.getElementById(errorId);
+        if (isValid) {
+            input.classList.remove("invalid");
+            if (errorEl) errorEl.classList.remove("show");
+            return true;
+        } else {
+            input.classList.add("invalid");
+            if (errorEl) errorEl.classList.add("show");
+            return false;
+        }
+    }
+
+    function isValidEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
     contactForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const name = contactForm.querySelector('input[type="text"]').value.trim();
-        const email = contactForm.querySelector('input[type="email"]').value.trim();
-        const message = contactForm.querySelector("textarea").value.trim();
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const message = messageInput.value.trim();
 
-        if (!name || !email || !message) {
-            alert("Please fill in all fields before sending.");
+        const nameValid = validateField(nameInput, "error-name", name.length > 0);
+        const emailValid = validateField(emailInput, "error-email", isValidEmail(email));
+        const messageValid = validateField(messageInput, "error-message-field", message.length > 0);
+
+        if (!nameValid || !emailValid || !messageValid) {
+            const firstInvalid = contactForm.querySelector(".invalid");
+            if (firstInvalid) firstInvalid.focus();
             return;
         }
 
         const msg = document.getElementById("contact-message");
-        if (msg) msg.style.display = "block";
+        if (msg) msg.hidden = false;
 
         contactForm.reset();
         console.log("Contact form submitted:", { name, email, message });
     });
+
+    // Clear error styling as the user fixes a field
+    [nameInput, emailInput, messageInput].forEach((input) => {
+        input.addEventListener("input", function () {
+            if (input.classList.contains("invalid")) {
+                input.classList.remove("invalid");
+                const errorEl = input.parentElement.querySelector(".field-error");
+                if (errorEl) errorEl.classList.remove("show");
+            }
+        });
+    });
 }
 
 // ===== ACTIVE NAV HIGHLIGHT =====
+// (server-rendered "active" class in each HTML file already covers this;
+//  this is a fallback in case a page is opened without one set)
 
 const currentPage = window.location.pathname.split("/").pop() || "index.html";
 const navLinks = document.querySelectorAll("nav a");
+const hasActive = Array.from(navLinks).some((link) => link.classList.contains("active"));
 
-navLinks.forEach((link) => {
-    if (link.getAttribute("href") === currentPage) {
-        link.classList.add("active");
-    }
-});
+if (!hasActive) {
+    navLinks.forEach((link) => {
+        if (link.getAttribute("href") === currentPage) {
+            link.classList.add("active");
+        }
+    });
+}
 
 // ===== CAROUSEL =====
 

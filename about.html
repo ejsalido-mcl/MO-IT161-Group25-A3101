@@ -1,77 +1,82 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>NetGuard - About Us</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="images/Netguard Logo.png">
-</head>
-<body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Learn about NetGuard, a browser-based Wi-Fi security self-assessment tool, and read frequently asked questions."
+    />
+    <title>NetGuard – About Us</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="images/Netguard Logo.png" />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <header>
-        <div class="WebsiteLogo">
-            <img src="images/Netguard Logo.png" alt="NetGuard Logo">
-        </div>
-        <h1>NetGuard</h1>
-        <p>Check your Wi-Fi security in just a few minutes.</p>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="assessment.html">Start Assessment</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
-        </nav>
+      <div class="WebsiteLogo">
+        <img src="images/Netguard Logo.png" alt="NetGuard logo" />
+      </div>
+      <h1>NetGuard</h1>
+      <p>Check your Wi-Fi security in just a few minutes.</p>
+      <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="assessment.html">Start Assessment</a>
+        <a href="about.html" class="active">About Us</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
     </header>
 
-    <main>
+    <main id="main-content">
+      <section>
+        <h2>About NetGuard</h2>
+        <p>
+          NetGuard was created to help everyday users understand the security of
+          their Wi-Fi networks. Many people don't realize their home network may
+          be vulnerable to unauthorized access.
+        </p>
+        <p>
+          This tool asks a few simple questions and gives you a clear risk score
+          with actionable steps to improve your security.
+        </p>
+      </section>
 
-        <section>
-            <h2>About NetGuard</h2>
-            <p>
-                NetGuard was created to help everyday users understand the security
-                of their Wi-Fi networks. Many people don't realize their home network
-                may be vulnerable to unauthorized access.
-            </p>
-            <p>
-                This tool asks a few simple questions and gives you a clear risk score
-                with actionable steps to improve your security.
-            </p>
-        </section>
+      <section>
+        <h2>Frequently Asked Questions</h2>
 
-        <section>
-            <h2>Frequently Asked Questions</h2>
+        <article>
+          <h3>How does NetGuard calculate my risk score?</h3>
+          <p>
+            Based on your answers, we check for common security issues like weak
+            passwords, outdated firmware, and missing encryption.
+          </p>
+        </article>
 
-            <article>
-                <h3>How does NetGuard calculate my risk score?</h3>
-                <p>
-                    Based on your answers, we check for common security issues like
-                    weak passwords, outdated firmware, and missing encryption.
-                </p>
-            </article>
+        <article>
+          <h3>Is my information saved?</h3>
+          <p>
+            No. NetGuard runs entirely in your browser. Your answers are only
+            saved locally on your device so you can resume later, and are never
+            sent to a server.
+          </p>
+        </article>
 
-            <article>
-                <h3>Is my information saved?</h3>
-                <p>
-                    No. NetGuard runs entirely in your browser. Your answers are not
-                    stored or sent anywhere.
-                </p>
-            </article>
-
-            <article>
-                <h3>What should I do if I get a High Risk score?</h3>
-                <p>
-                    Follow the checklist provided. Start with changing your Wi-Fi
-                    password and updating your router's firmware.
-                </p>
-            </article>
-
-        </section>
-
+        <article>
+          <h3>What should I do if I get a High Risk score?</h3>
+          <p>
+            Follow the checklist provided. Start with changing your Wi-Fi
+            password and updating your router's firmware.
+          </p>
+        </article>
+      </section>
     </main>
 
     <footer>
-        <p>Contact: support@netguard.com</p>
-        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+      <p>Contact: support@netguard.com</p>
+      <p>&copy; <span id="year"></span> NetGuard. All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

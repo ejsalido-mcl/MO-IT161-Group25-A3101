@@ -2,11 +2,34 @@
 
 /* ============================================
    NetGuard — Security Assessment Tool
-   Theme: White / Blue / Lime
-   Fonts: Montserrat, Archivo Black
+   Theme: Black / Green (primary) / Blue (secondary)
+   Fonts: Montserrat (body), Archivo Black (display)
    ============================================ */
 
-/* ===== Base Styles & Typography ===== */
+:root {
+    --bg: #0b0d0f;
+    --bg-elevated: #12161a;
+    --bg-elevated-hover: #171c21;
+    --border: #1f262b;
+
+    --text: #e7ecef;
+    --text-muted: #93a1ab;
+
+    --primary: #34d399;      /* green */
+    --primary-strong: #22b87e;
+    --secondary: #38bdf8;    /* blue */
+    --secondary-strong: #0ea5e9;
+
+    --risk-low: #34d399;
+    --risk-medium: #eab308;
+    --risk-high: #f87171;
+
+    --danger-bg: #2a1414;
+    --danger-border: #7f1d1d;
+
+    --focus-ring: #38bdf8;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -15,16 +38,53 @@ html {
     scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 body {
     font-family: 'Montserrat', sans-serif;
     line-height: 1.6;
-    color: #1e293b;
-    background-color: #f8fafc;
+    color: var(--text);
+    background-color: var(--bg);
     margin: 0;
     padding: 0;
 }
 
+/* ===== Accessibility: skip link & focus states ===== */
+
+.skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    background: var(--secondary);
+    color: #06222f;
+    padding: 12px 20px;
+    border-radius: 0 0 8px 0;
+    font-weight: 600;
+    z-index: 100;
+}
+
+.skip-link:focus {
+    left: 0;
+    top: 0;
+}
+
+:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
 /* ===== Layout Container ===== */
+
 body > * {
     max-width: 900px;
     margin-left: auto;
@@ -39,10 +99,23 @@ header, nav, main, footer {
 }
 
 /* ===== Header ===== */
+
 header {
     padding-top: 48px;
     padding-bottom: 24px;
     text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.WebsiteLogo {
+    margin-bottom: 12px;
+}
+
+.WebsiteLogo img {
+    max-width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 header h1 {
@@ -51,12 +124,12 @@ header h1 {
     font-weight: 400;
     letter-spacing: -0.5px;
     margin: 0 0 8px 0;
-    color: #1984c2;
+    color: var(--primary);
 }
 
 header p {
     font-size: 16px;
-    color: #64748b;
+    color: var(--text-muted);
     margin: 0;
 }
 
@@ -67,35 +140,35 @@ nav {
     justify-content: center;
     gap: 24px;
     padding: 16px 0;
-    border-top: 1px solid #186ad4;
-    border-bottom: 1px solid #186ad4;
-    width: fit-content;
-    margin: 24px auto; 
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
     flex-wrap: wrap;
 }
 
 nav a {
-    color: #1984c2;
+    color: var(--secondary);
     text-decoration: none;
     font-size: 15px;
     font-weight: 500;
     transition: color 0.15s ease;
+    padding: 4px 2px;
 }
 
 nav a:hover {
-    color: #32CD32;
+    color: var(--primary);
 }
 
 nav a.active {
-    color: #32CD32;
+    color: var(--primary);
     font-weight: 700;
+    border-bottom: 2px solid var(--primary);
 }
 
 /* ===== Sections ===== */
 
 section {
     padding: 32px 0;
-    border-bottom: 1px solid #186ad4;
+    border-bottom: 1px solid var(--border);
 }
 
 section h2 {
@@ -103,59 +176,132 @@ section h2 {
     font-size: 22px;
     font-weight: 400;
     margin: 0 0 16px 0;
-    color: #1984c2;
+    color: var(--secondary);
 }
 
 section p {
-    color: #475569;
+    color: var(--text-muted);
     margin: 0 0 16px 0;
 }
 
-/* ===== Form Inputs ===== */
+article h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--primary);
+    margin: 0 0 6px 0;
+}
+
+/* ===== Forms: fieldsets & questions ===== */
+
+fieldset {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 0 0 16px 0;
+    background: var(--bg-elevated);
+}
+
+fieldset.fieldset-error {
+    border-color: var(--risk-high);
+    background: var(--danger-bg);
+}
+
+.question-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 10px 0;
+}
+
+.radio-options {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.radio-options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin: 0;
+    cursor: pointer;
+}
+
+input[type="radio"] {
+    accent-color: var(--primary);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* ===== Generic form fields (contact page) ===== */
 
 label {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #334155;
+    color: var(--text);
     margin-top: 20px;
     margin-bottom: 6px;
 }
 
 input[type="text"],
 input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
 textarea {
     width: 100%;
     max-width: 420px;
     padding: 10px 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
-    background-color: #ffffff;
-    color: #1e293b;
+    background-color: var(--bg-elevated);
+    color: var(--text);
     transition: border-color 0.15s ease;
 }
 
 input:focus,
 textarea:focus {
     outline: none;
-    border-color: #1984c2;
+    border-color: var(--secondary);
 }
 
-input[type="radio"] {
-    margin-right: 6px;
-    accent-color: #1984c2;
+.field-error {
+    color: var(--risk-high);
+    font-size: 13px;
+    margin-top: 4px;
+    display: none;
+}
+
+.field-error.show {
+    display: block;
+}
+
+input.invalid,
+textarea.invalid {
+    border-color: var(--risk-high);
+}
+
+/* ===== Form action row ===== */
+
+.form-actions {
+    margin-top: 20px;
+}
+
+.form-actions button {
+    margin-top: 0;
 }
 
 /* ===== Buttons ===== */
 
 button {
-    background-color: #1984c2;
-    color: #ffffff;
+    background-color: var(--primary);
+    color: #062017;
     padding: 12px 24px;
     border: none;
     border-radius: 6px;
@@ -168,15 +314,106 @@ button {
 }
 
 button:hover {
-    background-color: #32CD32;
+    background-color: var(--primary-strong);
     transform: scale(1.03);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background-color: var(--bg-elevated-hover);
+    color: var(--text);
+    border: 1px solid var(--border);
+    margin-left: 12px;
+}
+
+.btn-secondary:hover {
+    background-color: #1d2329;
+}
+
+/* ===== Progress indicator ===== */
+
+.progress-status {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.progress-track {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--secondary);
+    width: 0%;
+    transition: width 0.2s ease;
+}
+
+/* ===== Restore banner ===== */
+
+.restore-banner {
+    background: var(--bg-elevated);
+    border: 1px solid var(--secondary);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    margin: 12px 0 20px 0;
+}
+
+.restore-banner[hidden] {
+    display: none;
+}
+
+/* ===== Error summary banner ===== */
+
+.error-summary {
+    display: none;
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+}
+
+.error-summary.show {
+    display: block;
+}
+
+.error-summary h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--risk-high);
+    margin: 0 0 8px 0;
+}
+
+.error-summary ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.error-summary a {
+    color: var(--risk-high);
+    text-decoration: underline;
+    font-size: 14px;
 }
 
 /* ===== Results Box ===== */
 
 .result-box {
-    background-color: #f1f5f9;
-    border-left: 4px solid #1984c2;
+    background-color: var(--bg-elevated);
+    border-left: 4px solid var(--secondary);
     padding: 20px;
     border-radius: 6px;
     margin-top: 16px;
@@ -194,28 +431,18 @@ button:hover {
     font-size: 14px;
     font-weight: 400;
     margin: 16px 0 8px 0;
-    color: #1984c2;
+    color: var(--secondary);
 }
 
-/* ===== Risk Level Colors ===== */
-
-.risk-low {
-    color: #22c55e;
-}
-
-.risk-medium {
-    color: #eab308;
-}
-
-.risk-high {
-    color: #ef4444;
-}
+.risk-low { color: var(--risk-low); }
+.risk-medium { color: var(--risk-medium); }
+.risk-high { color: var(--risk-high); }
 
 /* ===== Lists & Images ===== */
 
 ul, ol {
     padding-left: 20px;
-    color: #475569;
+    color: var(--text-muted);
 }
 
 li {
@@ -227,10 +454,8 @@ img {
     height: auto;
 }
 
-/* ===== Links ===== */
-
 a {
-    color: #1984c2;
+    color: var(--secondary);
     text-decoration: none;
 }
 
@@ -243,47 +468,9 @@ a:hover {
 footer {
     padding: 32px 0;
     font-size: 13px;
-    color: #01060e;
+    color: var(--text-muted);
     text-align: center;
-}
-
-/* ===== Responsive ===== */
-
-@media (max-width: 640px) {
-    header h1 {
-        font-size: 28px;
-    }
-
-    nav {
-        gap: 16px;
-        font-size: 14px;
-    }
-
-    section {
-        padding: 24px 0;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="number"],
-    input[type="date"],
-    textarea {
-        max-width: 100%;
-    }
-}
-
-/* ===== Website Logo ===== */
-
-.WebsiteLogo {
-    margin-bottom: 12px;
-}
-
-.WebsiteLogo img {
-    max-width: 100px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
+    border-top: 1px solid var(--border);
 }
 
 /* ===== Hero Section ===== */
@@ -294,7 +481,10 @@ footer {
 }
 
 .hero h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 400;
     font-size: 32px;
+    color: var(--primary);
     margin-bottom: 12px;
 }
 
@@ -321,8 +511,8 @@ footer {
 }
 
 .why-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 20px;
     text-align: left;
@@ -331,20 +521,20 @@ footer {
 
 .why-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(25, 132, 194, 0.12);
+    box-shadow: 0 6px 20px rgba(52, 211, 153, 0.12);
 }
 
 .why-card h3 {
     font-family: 'Archivo Black', sans-serif;
     font-size: 18px;
     font-weight: 400;
-    color: #1984c2;
+    color: var(--primary);
     margin: 0 0 8px 0;
 }
 
 .why-card p {
     font-size: 14px;
-    color: #475569;
+    color: var(--text-muted);
     margin: 0;
 }
 
@@ -377,8 +567,8 @@ footer {
 
 .card {
     flex: 0 0 250px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
     border-radius: 10px;
     padding: 20px;
     text-align: left;
@@ -387,25 +577,25 @@ footer {
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(25, 132, 194, 0.12);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.12);
 }
 
 .card h3 {
     font-family: 'Archivo Black', sans-serif;
     font-size: 16px;
     font-weight: 400;
-    color: #1984c2;
+    color: var(--secondary);
     margin: 0 0 8px 0;
 }
 
 .card p {
     font-size: 14px;
-    color: #475569;
+    color: var(--text-muted);
     margin: 0 0 12px 0;
 }
 
 .card a {
-    color: #32CD32;
+    color: var(--primary);
     font-weight: 600;
     text-decoration: none;
 }
@@ -415,37 +605,59 @@ footer {
 }
 
 .carousel-btn {
-    background: #1984c2;
-    color: #ffffff;
-    border: none;
-    font-size: 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 18px;
     padding: 10px 14px;
     border-radius: 50%;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease;
     flex-shrink: 0;
+    margin-top: 0;
 }
 
 .carousel-btn:hover {
-    background: #32CD32;
-}
-
-/* ===== Secondary Button ===== */
-
-.btn-secondary {
-    background-color: #e2e8f0;
-    color: #334155;
-    margin-left: 12px;
-}
-
-.btn-secondary:hover {
-    background-color: #cbd5e1;
+    background: var(--bg-elevated-hover);
+    border-color: var(--secondary);
+    transform: none;
 }
 
 /* ===== Contact Success Message ===== */
 
 #contact-message {
-    color: #22c55e;
+    color: var(--primary);
     margin-top: 16px;
     font-weight: 500;
+}
+
+#contact-message[hidden] {
+    display: none;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 640px) {
+    header h1 {
+        font-size: 28px;
+    }
+
+    nav {
+        gap: 16px;
+        font-size: 14px;
+    }
+
+    section {
+        padding: 24px 0;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        max-width: 100%;
+    }
+
+    .radio-options {
+        gap: 12px;
+    }
 }

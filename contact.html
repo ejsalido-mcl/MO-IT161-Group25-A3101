@@ -1,48 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NetGuard - Contact Us</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact the NetGuard team with questions about Wi-Fi security or the assessment tool.">
+    <title>NetGuard – Contact Us</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="images/Netguard Logo.png">
 </head>
 <body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <header>
         <div class="WebsiteLogo">
-            <img src="images/Netguard Logo.png" alt="NetGuard Logo">
+            <img src="images/Netguard Logo.png" alt="NetGuard logo">
         </div>
         <h1>NetGuard</h1>
         <p>Check your Wi-Fi security in just a few minutes.</p>
-        <nav>
+        <nav aria-label="Main navigation">
             <a href="index.html">Home</a>
             <a href="assessment.html">Start Assessment</a>
             <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
+            <a href="contact.html" class="active">Contact Us</a>
         </nav>
     </header>
 
-    <main>
+    <main id="main-content">
 
         <section>
             <h2>Contact Us</h2>
             <p>Have a question or need help securing your network? Send us a message.</p>
 
-            <form id="contact-form">
-                <label>Your Name:</label>
-                <input type="text" placeholder="Enter your name">
+            <form id="contact-form" novalidate>
+                <label for="contact-name">Your Name:</label>
+                <input type="text" id="contact-name" name="name" placeholder="Enter your name" required aria-describedby="error-name">
+                <span class="field-error" id="error-name">Please enter your name.</span>
 
-                <label>Email Address:</label>
-                <input type="email" placeholder="Enter your email">
+                <label for="contact-email">Email Address:</label>
+                <input type="email" id="contact-email" name="email" placeholder="Enter your email" required aria-describedby="error-email">
+                <span class="field-error" id="error-email">Please enter a valid email address.</span>
 
-                <label>Subject:</label>
-                <input type="text" placeholder="What is this about?">
+                <label for="contact-subject">Subject:</label>
+                <input type="text" id="contact-subject" name="subject" placeholder="What is this about?">
 
-                <label>Message:</label>
-                <textarea rows="5" placeholder="Describe your concern or question."></textarea>
-                <p></p>
-                <button>Send Message</button>
+                <label for="contact-message-input">Message:</label>
+                <textarea id="contact-message-input" name="message" rows="5" placeholder="Describe your concern or question." required aria-describedby="error-message-field"></textarea>
+                <span class="field-error" id="error-message-field">Please enter a message.</span>
+
+                <div class="form-actions">
+                    <button type="submit">Send Message</button>
+                </div>
             </form>
 
-            <p id="contact-message" style="display: none;">
+            <p id="contact-message" hidden role="status">
                 Thank you! Your message has been received. We'll get back to you within 24 hours.
             </p>
         </section>
@@ -60,7 +71,7 @@
 
     <footer>
         <p>Contact: support@netguard.com</p>
-        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+        <p>&copy; <span id="year"></span> NetGuard. All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>

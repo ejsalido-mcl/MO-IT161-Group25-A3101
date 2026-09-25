@@ -1,27 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NetGuard - Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NetGuard helps you check the security of your home or small-office Wi-Fi setup with a quick self-assessment.">
+    <title>NetGuard – Home</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="images/Netguard Logo.png">
 </head>
 <body>
 
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <header>
         <div class="WebsiteLogo">
-            <img src="images/Netguard Logo.png" alt="NetGuard Logo">
+            <img src="images/Netguard Logo.png" alt="NetGuard logo">
         </div>
         <h1>NetGuard</h1>
         <p>Check your Wi-Fi security in just a few minutes.</p>
-        <nav>
-            <a href="index.html">Home</a>
+        <nav aria-label="Main navigation">
+            <a href="index.html" class="active">Home</a>
             <a href="assessment.html">Start Assessment</a>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact Us</a>
         </nav>
     </header>
 
-    <main>
+    <main id="main-content">
 
         <!-- ===== Hero Section ===== -->
         <section class="hero">
@@ -31,9 +36,9 @@
                 Wi-Fi setup. Answer a few quick questions and get a clear risk score
                 with actionable fixes.
             </p>
-            <img src="images/wifi-security.jpg" alt="Wi-Fi Security">
+            <img src="images/wifi-security.jpg" alt="Illustration of a secured home Wi-Fi network">
             <br>
-            <a href="assessment.html"><button>Start Assessment</button></a>
+            <a href="assessment.html"><button type="button">Start Assessment</button></a>
         </section>
 
         <!-- ===== Why Choose NetGuard ===== -->
@@ -96,7 +101,7 @@
             <h2>Learn More About Wi-Fi Security</h2>
 
             <div class="carousel-wrapper">
-                <button class="carousel-btn prev">&lt;</button>
+                <button type="button" class="carousel-btn prev" aria-label="Previous card">&lt;</button>
 
                 <div class="carousel-container">
                     <div class="card">
@@ -136,7 +141,7 @@
                     </div>
                 </div>
 
-                <button class="carousel-btn next">&gt;</button>
+                <button type="button" class="carousel-btn next" aria-label="Next card">&gt;</button>
             </div>
         </section>
 
@@ -144,7 +149,7 @@
 
     <footer>
         <p>Contact: support@netguard.com</p>
-        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+        <p>&copy; <span id="year"></span> NetGuard. All rights reserved.</p>
     </footer>
 
     <script src="script.js"></script>
