@@ -434,6 +434,10 @@ button:disabled {
     color: var(--secondary);
 }
 
+.result-box.result-low { border-left-color: var(--risk-low); }
+.result-box.result-medium { border-left-color: var(--risk-medium); }
+.result-box.result-high { border-left-color: var(--risk-high); }
+
 .risk-low { color: var(--risk-low); }
 .risk-medium { color: var(--risk-medium); }
 .risk-high { color: var(--risk-high); }
@@ -594,14 +598,30 @@ footer {
     margin: 0 0 12px 0;
 }
 
-.card a {
+.tip-toggle {
+    background: none;
     color: var(--primary);
+    padding: 0;
+    margin: 0;
     font-weight: 600;
+    font-size: 14px;
+    border-radius: 2px;
     text-decoration: none;
 }
 
-.card a:hover {
+.tip-toggle:hover {
+    background: none;
     text-decoration: underline;
+    transform: none;
+}
+
+.tip-body {
+    margin: 12px 0 0 0;
+    font-size: 13px;
+}
+
+.tip-body[hidden] {
+    display: none;
 }
 
 .carousel-btn {
@@ -617,7 +637,12 @@ footer {
     margin-top: 0;
 }
 
-.carousel-btn:hover {
+.carousel-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.carousel-btn:hover:not(:disabled) {
     background: var(--bg-elevated-hover);
     border-color: var(--secondary);
     transform: none;
