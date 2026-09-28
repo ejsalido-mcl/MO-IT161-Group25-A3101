@@ -4,6 +4,12 @@ A browser-based self-assessment tool that helps everyday users check the securit
 
 Users answer a short series of yes/no questions about their network. Based on their answers, the system calculates a simple risk score (Low / Medium / High) and provides a checklist of clear, actionable fixes for anything flagged.
 
+## 📚 Project Documents
+
+| Document | Link |
+|----------|------|
+| **Application Development Workflow Worksheet** | [Open in Google Sheets](https://docs.google.com/spreadsheets/d/1ePzmws0MpG4CEh5o9x4xcvqGJ91ZuvOXTstRpDk-x0k/edit?usp=sharing) |
+| **AI Use Statement** | [Open in Google Sheets](https://docs.google.com/document/d/1dF5oUIwnfu8PPugnD_uWuHlck3gwlpfe6wzSY6YYIP8/edit?usp=sharing) |
 ---
 
 ## 📖 Table of Contents
@@ -14,6 +20,8 @@ Users answer a short series of yes/no questions about their network. Based on th
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [How It Works](#-how-it-works)
+- [Design](#-design)
+- [Project Documents](#-project-documents)
 - [Team](#-team)
 - [Course](#-course)
 
