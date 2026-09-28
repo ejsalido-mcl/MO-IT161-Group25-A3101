@@ -209,6 +209,9 @@ function showResults(riskLevel, checklist, safeAnswers) {
     placeholder.style.display = "none";
     resultBox.style.display = "block";
 
+    resultBox.classList.remove("result-low", "result-medium", "result-high");
+    resultBox.classList.add(`result-${riskLevel.toLowerCase()}`);
+
     riskLevelEl.textContent = `Risk Level: ${riskLevel}`;
     riskLevelEl.className = "";
     riskLevelEl.classList.add(`risk-${riskLevel.toLowerCase()}`);
@@ -324,6 +327,12 @@ if (prevBtn && nextBtn && carouselContainer) {
     const card = carouselContainer.querySelector(".card");
     const cardWidth = card.offsetWidth + 20;
 
+    function updateCarouselButtons() {
+        const maxScroll = carouselContainer.scrollWidth - carouselContainer.clientWidth;
+        prevBtn.disabled = carouselContainer.scrollLeft <= 1;
+        nextBtn.disabled = carouselContainer.scrollLeft >= maxScroll - 1;
+    }
+
     prevBtn.addEventListener("click", () => {
         carouselContainer.scrollBy({ left: -cardWidth, behavior: "smooth" });
     });
@@ -331,4 +340,20 @@ if (prevBtn && nextBtn && carouselContainer) {
     nextBtn.addEventListener("click", () => {
         carouselContainer.scrollBy({ left: cardWidth, behavior: "smooth" });
     });
+
+    carouselContainer.addEventListener("scroll", updateCarouselButtons);
+    window.addEventListener("resize", updateCarouselButtons);
+    updateCarouselButtons();
 }
+
+// ===== EXPANDABLE TIPS =====
+
+document.querySelectorAll(".tip-toggle").forEach((btn) => {
+    btn.addEventListener("click", function () {
+        const body = btn.nextElementSibling;
+        const isOpen = btn.getAttribute("aria-expanded") === "true";
+        btn.setAttribute("aria-expanded", String(!isOpen));
+        btn.textContent = isOpen ? "Learn more" : "Show less";
+        if (body) body.hidden = isOpen;
+    });
+});
