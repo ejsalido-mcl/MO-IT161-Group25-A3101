@@ -9,7 +9,7 @@ Users answer a short series of yes/no questions about their network. Based on th
 | Document | Link |
 |----------|------|
 | **Application Development Workflow Worksheet** | [Open in Google Sheets](https://docs.google.com/spreadsheets/d/1ePzmws0MpG4CEh5o9x4xcvqGJ91ZuvOXTstRpDk-x0k/edit?usp=sharing) |
-| **AI Use Statement** | [Open in Google Sheets](https://docs.google.com/document/d/1dF5oUIwnfu8PPugnD_uWuHlck3gwlpfe6wzSY6YYIP8/edit?usp=sharing) |
+| **AI Use Statement** | [Open in Google Sheets](https://docs.google.com/document/d/1d5d_AJy_V9Srx4gRgZh0hKpEZf1F6S4XSwOs-g-M4U4/edit?usp=sharing) |
 ---
 
 ## 📖 Table of Contents
