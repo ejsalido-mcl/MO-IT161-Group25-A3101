@@ -132,7 +132,10 @@ if (contactForm) {
     contactForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const name = contactForm.querySelector('input[type="text"]').value.trim();
+        // 1. Collect the data
+        const textInputs = contactForm.querySelectorAll('input[type="text"]');
+        const name = textInputs[0] ? textInputs[0].value.trim() : "";
+        const subject = textInputs[1] ? textInputs[1].value.trim() : "";
         const email = contactForm.querySelector('input[type="email"]').value.trim();
         const message = contactForm.querySelector("textarea").value.trim();
 
@@ -141,6 +144,7 @@ if (contactForm) {
             return;
         }
 
+<<<<<<< Updated upstream
         // Show success message
         document.getElementById("contact-message").style.display = "block";
 
@@ -148,5 +152,36 @@ if (contactForm) {
         contactForm.reset();
 
         console.log("Contact form submitted:", { name, email, message });
+=======
+        // 2. Package the data
+        const contactData = { name, email, subject, message };
+        const submitBtn = contactForm.querySelector("button");
+        if (submitBtn) submitBtn.disabled = true;
+
+        // 3. Send to backend
+        fetch("/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(contactData)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Server responded with " + response.status);
+            return response.json();
+        })
+        .then(data => {
+            // 4. Show success message
+            const msg = document.getElementById("contact-message");
+            if (msg) msg.style.display = "block";
+            contactForm.reset();
+            console.log("Server:", data.message);
+        })
+        .catch(error => {
+            console.error("Contact form error:", error);
+            alert("Sorry, your message couldn't be sent. Please try again later.");
+        })
+        .finally(() => {
+            if (submitBtn) submitBtn.disabled = false;
+        });
+>>>>>>> Stashed changes
     });
 }
