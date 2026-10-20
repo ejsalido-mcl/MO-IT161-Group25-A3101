@@ -71,6 +71,27 @@ if (assessmentForm) {
 
         // Show results
         showResults(riskLevel, checklist, safeAnswers);
+
+        // --- NEW: Send results to backend ---
+        const resultData = {
+            riskLevel: riskLevel,
+            score: safeAnswers
+        };
+
+        fetch("/save-result", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(resultData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Backend says:", data.message);
+        })
+        .catch(error => {
+            console.error("Error saving to backend:", error);
+        });
     });
 }
 
@@ -144,15 +165,6 @@ if (contactForm) {
             return;
         }
 
-<<<<<<< Updated upstream
-        // Show success message
-        document.getElementById("contact-message").style.display = "block";
-
-        // Clear the form
-        contactForm.reset();
-
-        console.log("Contact form submitted:", { name, email, message });
-=======
         // 2. Package the data
         const contactData = { name, email, subject, message };
         const submitBtn = contactForm.querySelector("button");
@@ -182,6 +194,5 @@ if (contactForm) {
         .finally(() => {
             if (submitBtn) submitBtn.disabled = false;
         });
->>>>>>> Stashed changes
     });
 }

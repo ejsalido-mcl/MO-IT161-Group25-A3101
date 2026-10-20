@@ -1,11 +1,14 @@
 const express = require("express");
 const path = require("path");
-const fs = require("fs"); // 1. Require File System
+const fs = require("fs");
 
 const app = express();
 
-// 2. Middleware to read JSON from frontend
+// 1. Middleware to read JSON
 app.use(express.json());
+
+// 2. Serve static files (CSS, JS, images)
+app.use(express.static(__dirname));
 
 // --- FRONTEND ROUTES ---
 app.get("/", (req, res) => {
@@ -24,21 +27,32 @@ app.get("/contact", (req, res) => {
     res.sendFile(path.join(__dirname, "contact.html"));
 });
 
-// --- BACKEND FEATURE: Receive and Save Contact Messages ---
+// --- BACKEND FEATURE 1: Save Contact Messages ---
 app.post("/contact", (req, res) => {
     console.log("Message received from:", req.body.name);
-
-    // 3. Read existing messages
     const messages = JSON.parse(fs.readFileSync("messages.json", "utf8"));
-
-    // 4. Add new message
     messages.push(req.body);
-
-    // 5. Save back to file
     fs.writeFileSync("messages.json", JSON.stringify(messages, null, 2));
-
-    // 6. Send response to frontend
     res.json({ message: "Message saved successfully!" });
+});
+
+// --- BACKEND FEATURE 2: Save Assessment Results ---
+app.post("/save-result", (req, res) => {
+    // Read existing results
+    const results = JSON.parse(fs.readFileSync("results.json", "utf8"));
+
+    // Add a timestamp to the new result
+    const newResult = {
+        ...req.body,
+        date: new Date().toLocaleString()
+    };
+
+    // Save to file
+    results.push(newResult);
+    fs.writeFileSync("results.json", JSON.stringify(results, null, 2));
+
+    console.log("Assessment saved:", newResult.riskLevel, newResult.score + "/10");
+    res.json({ message: "Assessment saved successfully!" });
 });
 
 app.listen(3000, () => {
