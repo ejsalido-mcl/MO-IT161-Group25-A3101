@@ -27,32 +27,71 @@ app.get("/contact", (req, res) => {
     res.sendFile(path.join(__dirname, "contact.html"));
 });
 
-// --- BACKEND FEATURE 1: Save Contact Messages ---
+app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, "admin.html"));
+});
+
+// --- BACKEND FEATURE 1: Contact Messages ---
+
+// Save a message (Create)
 app.post("/contact", (req, res) => {
-    console.log("Message received from:", req.body.name);
+    const { name, email, subject, message } = req.body;
+
+    // Server-side validation: never trust the browser alone
+    if (!name || !name.trim() || !email || !email.trim() || !message || !message.trim()) {
+        return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    console.log("Message received from:", name);
     const messages = JSON.parse(fs.readFileSync("messages.json", "utf8"));
-    messages.push(req.body);
+    messages.push({
+        name: name.trim(),
+        email: email.trim(),
+        subject: subject ? subject.trim() : "",
+        message: message.trim(),
+        date: new Date().toLocaleString()
+    });
     fs.writeFileSync("messages.json", JSON.stringify(messages, null, 2));
     res.json({ message: "Message saved successfully!" });
 });
 
-// --- BACKEND FEATURE 2: Save Assessment Results ---
+// Retrieve all messages (Read) - used by the Admin page
+app.get("/api/messages", (req, res) => {
+    const messages = JSON.parse(fs.readFileSync("messages.json", "utf8"));
+    res.json(messages);
+});
+
+// --- BACKEND FEATURE 2: Assessment Results ---
+
+// Save a result (Create)
 app.post("/save-result", (req, res) => {
-    // Read existing results
+    const { riskLevel, score } = req.body;
+
+    // Server-side validation
+    const validLevels = ["Low", "Medium", "High"];
+    if (!validLevels.includes(riskLevel) || !Number.isInteger(score) || score < 0 || score > 10) {
+        return res.status(400).json({ error: "Invalid assessment result." });
+    }
+
     const results = JSON.parse(fs.readFileSync("results.json", "utf8"));
 
-    // Add a timestamp to the new result
     const newResult = {
-        ...req.body,
+        riskLevel: riskLevel,
+        score: score,
         date: new Date().toLocaleString()
     };
 
-    // Save to file
     results.push(newResult);
     fs.writeFileSync("results.json", JSON.stringify(results, null, 2));
 
     console.log("Assessment saved:", newResult.riskLevel, newResult.score + "/10");
     res.json({ message: "Assessment saved successfully!" });
+});
+
+// Retrieve all results (Read) - used by the Admin page
+app.get("/api/results", (req, res) => {
+    const results = JSON.parse(fs.readFileSync("results.json", "utf8"));
+    res.json(results);
 });
 
 app.listen(3000, () => {

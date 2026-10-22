@@ -204,3 +204,30 @@ img {
 .risk-high {
     color: #ef4444;
 }
+
+
+/* ===== Admin Dashboard Tables ===== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background-color: #ffffff;
+}
+
+th, td {
+    border: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+td {
+    color: #475569;
+}

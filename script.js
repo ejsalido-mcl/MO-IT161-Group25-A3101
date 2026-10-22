@@ -196,3 +196,77 @@ if (contactForm) {
         });
     });
 }
+
+// ===== ADMIN DASHBOARD =====
+
+// Escape text before putting it in the page, so a message containing
+// HTML or <script> tags is shown as plain text instead of running.
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// 1. Load Messages
+const messagesContainer = document.getElementById("messages-container");
+
+if (messagesContainer) {
+    fetch("/api/messages")
+        .then(response => response.json())
+        .then(messages => {
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = "<p>No messages yet.</p>";
+                return;
+            }
+
+            let html = "<table><tr><th>Date</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th></tr>";
+            messages.forEach(msg => {
+                html += `<tr>
+                            <td>${escapeHTML(msg.date || "—")}</td>
+                            <td>${escapeHTML(msg.name)}</td>
+                            <td>${escapeHTML(msg.email)}</td>
+                            <td>${escapeHTML(msg.subject || "—")}</td>
+                            <td>${escapeHTML(msg.message)}</td>
+                         </tr>`;
+            });
+            html += "</table>";
+            messagesContainer.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Error loading messages:", error);
+            messagesContainer.innerHTML = "<p>Could not load messages. Is the server running?</p>";
+        });
+}
+
+// 2. Load Assessment Results
+const resultsContainer = document.getElementById("results-container");
+
+if (resultsContainer) {
+    fetch("/api/results")
+        .then(response => response.json())
+        .then(results => {
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>No assessments taken yet.</p>";
+                return;
+            }
+
+            let html = "<table><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr>";
+            results.forEach(result => {
+                const level = escapeHTML(result.riskLevel);
+                html += `<tr>
+                            <td>${escapeHTML(result.date)}</td>
+                            <td class="risk-${level.toLowerCase()}">${level}</td>
+                            <td>${escapeHTML(result.score)}/10</td>
+                         </tr>`;
+            });
+            html += "</table>";
+            resultsContainer.innerHTML = html;
+        })
+        .catch(error => {
+            console.error("Error loading results:", error);
+            resultsContainer.innerHTML = "<p>Could not load results. Is the server running?</p>";
+        });
+}
