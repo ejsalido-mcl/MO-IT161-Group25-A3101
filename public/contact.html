@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard – Contact Us</title>
+    <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="brand">
+            <img src="images/shield.svg" alt="" class="brand-icon">
+            <span>NetGuard</span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="assessment.html">Start Assessment</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html" aria-current="page">Contact Us</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="page-intro">
+            <p class="eyebrow">Get in touch</p>
+            <h1>Contact Us</h1>
+            <p class="lead">Have a question or need help securing your network? Send us a message.</p>
+        </section>
+
+        <section class="contact-layout">
+
+            <div class="card">
+                <form id="contact-form">
+                    <label for="contact-name">Your Name:</label>
+                    <input type="text" id="contact-name" placeholder="Enter your name">
+
+                    <label for="contact-email">Email Address:</label>
+                    <input type="email" id="contact-email" placeholder="Enter your email">
+
+                    <label for="contact-subject">Subject:</label>
+                    <input type="text" id="contact-subject" placeholder="What is this about?">
+
+                    <label for="contact-text">Message:</label>
+                    <textarea id="contact-text" rows="5" placeholder="Describe your concern or question."></textarea>
+
+                    <button>Send Message</button>
+                </form>
+                <p id="contact-message" class="success-text" style="display: none;">
+                    Thank you! Your message has been received. We'll get back to you within 24 hours.
+                </p>
+            </div>
+
+            <aside class="card">
+                <h2>Other Ways to Reach Us</h2>
+                <ul class="info-list">
+                    <li><strong>Email:</strong> support@netguard.com</li>
+                    <li><strong>Response time:</strong> Within 24 hours</li>
+                    <li><strong>Hours:</strong> Monday–Friday, 9AM–5PM</li>
+                </ul>
+            </aside>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Contact: support@netguard.com</p>
+        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

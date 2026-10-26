@@ -6,7 +6,7 @@ console.log("NetGuard script loaded.");
 
 // ===== ASSESSMENT FORM =====
 
-const assessmentForm = document.querySelector("form");
+const assessmentForm = document.getElementById("assessment-form");
 
 if (assessmentForm) {
     assessmentForm.addEventListener("submit", function (event) {
@@ -199,74 +199,136 @@ if (contactForm) {
 
 // ===== ADMIN DASHBOARD =====
 
-// Escape text before putting it in the page, so a message containing
-// HTML or <script> tags is shown as plain text instead of running.
 function escapeHTML(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+    return String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-// 1. Load Messages
+function adminFetch(url, options) {
+    return fetch(url, options).then(response => {
+        if (response.status === 401) {
+            window.location.href = "/login";
+            throw new Error("Not logged in");
+        }
+        if (!response.ok) throw new Error("Server responded with " + response.status);
+        return response.json();
+    });
+}
+
 const messagesContainer = document.getElementById("messages-container");
+const resultsContainer = document.getElementById("results-container");
+const statsContainer = document.getElementById("stats-container");
+
+function loadMessages() {
+    adminFetch("/api/messages").then(messages => {
+        if (messages.length === 0) {
+            messagesContainer.innerHTML = "<p>No messages yet.</p>";
+            return;
+        }
+        let html = `<table><tr><th>Date</th><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr>`;
+        messages.forEach(msg => {
+            const resolved = msg.status === "resolved";
+            const id = escapeHTML(msg.id);
+            html += `<tr class="${resolved ? "row-resolved" : ""}">
+                <td>${escapeHTML(msg.date || "—")}</td>
+                <td>${escapeHTML(msg.name)}</td>
+                <td>${escapeHTML(msg.email)}</td>
+                <td>${escapeHTML(msg.message)}</td>
+                <td>${resolved ? "Resolved" : "New"}</td>
+                <td class="actions">
+                    <button class="btn-small" data-action="toggle" data-id="${id}" data-status="${resolved ? "new" : "resolved"}">
+                        ${resolved ? "Mark as new" : "Mark resolved"}
+                    </button>
+                    <button class="btn-small btn-danger" data-action="delete" data-id="${id}">Delete</button>
+                </td>
+            </tr>`;
+        });
+        html += "</table>";
+        messagesContainer.innerHTML = html;
+    }).catch(error => {
+        if (error.message !== "Not logged in") messagesContainer.innerHTML = "<p>Could not load messages.</p>";
+    });
+}
 
 if (messagesContainer) {
-    fetch("/api/messages")
-        .then(response => response.json())
-        .then(messages => {
-            if (messages.length === 0) {
-                messagesContainer.innerHTML = "<p>No messages yet.</p>";
-                return;
-            }
+    loadMessages();
+    messagesContainer.addEventListener("click", function (event) {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+        const url = "/api/messages/" + encodeURIComponent(button.dataset.id);
 
-            let html = "<table><tr><th>Date</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th></tr>";
-            messages.forEach(msg => {
-                html += `<tr>
-                            <td>${escapeHTML(msg.date || "—")}</td>
-                            <td>${escapeHTML(msg.name)}</td>
-                            <td>${escapeHTML(msg.email)}</td>
-                            <td>${escapeHTML(msg.subject || "—")}</td>
-                            <td>${escapeHTML(msg.message)}</td>
-                         </tr>`;
-            });
-            html += "</table>";
-            messagesContainer.innerHTML = html;
-        })
-        .catch(error => {
-            console.error("Error loading messages:", error);
-            messagesContainer.innerHTML = "<p>Could not load messages. Is the server running?</p>";
-        });
+        if (button.dataset.action === "delete") {
+            if (!confirm("Delete this message?")) return;
+            adminFetch(url, { method: "DELETE" }).then(loadMessages);
+        }
+        if (button.dataset.action === "toggle") {
+            adminFetch(url, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: button.dataset.status })
+            }).then(loadMessages);
+        }
+    });
 }
 
-// 2. Load Assessment Results
-const resultsContainer = document.getElementById("results-container");
+function showStats(results) {
+    if (!statsContainer) return;
+    const total = results.length;
+    const average = total ? (results.reduce((sum, r) => sum + Number(r.score || 0), 0) / total).toFixed(1) + "/10" : "—";
+    const count = level => results.filter(r => r.riskLevel === level).length;
+
+    statsContainer.innerHTML = `
+        <div class="stat-card"><span class="stat-number">${total}</span><span class="stat-label">Assessments taken</span></div>
+        <div class="stat-card"><span class="stat-number">${average}</span><span class="stat-label">Average score</span></div>
+        <div class="stat-card"><span class="stat-number risk-low">${count("Low")}</span><span class="stat-label">Low risk</span></div>
+        <div class="stat-card"><span class="stat-number risk-medium">${count("Medium")}</span><span class="stat-label">Medium risk</span></div>
+        <div class="stat-card"><span class="stat-number risk-high">${count("High")}</span><span class="stat-label">High risk</span></div>
+    `;
+}
 
 if (resultsContainer) {
-    fetch("/api/results")
-        .then(response => response.json())
-        .then(results => {
-            if (results.length === 0) {
-                resultsContainer.innerHTML = "<p>No assessments taken yet.</p>";
-                return;
-            }
-
-            let html = "<table><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr>";
-            results.forEach(result => {
-                const level = escapeHTML(result.riskLevel);
-                html += `<tr>
-                            <td>${escapeHTML(result.date)}</td>
-                            <td class="risk-${level.toLowerCase()}">${level}</td>
-                            <td>${escapeHTML(result.score)}/10</td>
-                         </tr>`;
-            });
-            html += "</table>";
-            resultsContainer.innerHTML = html;
-        })
-        .catch(error => {
-            console.error("Error loading results:", error);
-            resultsContainer.innerHTML = "<p>Could not load results. Is the server running?</p>";
+    adminFetch("/api/results").then(results => {
+        showStats(results);
+        if (results.length === 0) {
+            resultsContainer.innerHTML = "<p>No assessments taken yet.</p>";
+            return;
+        }
+        let html = "<table><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr>";
+        results.forEach(result => {
+            const level = escapeHTML(result.riskLevel);
+            html += `<tr><td>${escapeHTML(result.date)}</td><td class="risk-${level.toLowerCase()}">${level}</td><td>${escapeHTML(result.score)}/10</td></tr>`;
         });
+        html += "</table>";
+        resultsContainer.innerHTML = html;
+    }).catch(error => {
+        if (error.message !== "Not logged in") resultsContainer.innerHTML = "<p>Could not load results.</p>";
+    });
+}
+
+const logoutButton = document.getElementById("logout-button");
+if (logoutButton) {
+    logoutButton.addEventListener("click", function () {
+        fetch("/logout", { method: "POST" }).finally(() => { window.location.href = "/login"; });
+    });
+}
+
+const loginForm = document.getElementById("login-form");
+if (loginForm) {
+    loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const password = document.getElementById("admin-password").value;
+        const errorText = document.getElementById("login-error");
+        errorText.style.display = "none";
+
+        fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password })
+        }).then(response => {
+            if (response.ok) window.location.href = "/admin";
+            else {
+                errorText.textContent = "Wrong password. Please try again.";
+                errorText.style.display = "block";
+            }
+        });
+    });
 }

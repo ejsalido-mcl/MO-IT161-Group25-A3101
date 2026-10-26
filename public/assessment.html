@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard – Start Assessment</title>
+    <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="brand">
+            <img src="images/shield.svg" alt="" class="brand-icon">
+            <span>NetGuard</span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="assessment.html" aria-current="page">Start Assessment</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="page-intro">
+            <p class="eyebrow">Wi-Fi security check</p>
+            <h1>Start Your Assessment</h1>
+            <p class="lead">Answer the questions below about your Wi-Fi setup.</p>
+        </section>
+
+        <section>
+            <form id="assessment-form" class="assessment-form">
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">1</span> Do you use a strong password for your Wi-Fi network?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q1" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q1" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">2</span> Is your Wi-Fi password shared with many people?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q2" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q2" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">3</span> Is your router's admin password still the default one?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q3" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q3" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">4</span> Do you keep your router's firmware updated?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q4" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q4" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">5</span> Do you use WPA2 or WPA3 encryption?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q5" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q5" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">6</span> Is your Wi-Fi network hidden from public view?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q6" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q6" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">7</span> Do you have a guest network for visitors?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q7" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q7" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">8</span> Do you regularly check who is connected to your network?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q8" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q8" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">9</span> Is your router placed in a secure location?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q9" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q9" value="no"> No</label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <p class="question-text"><span class="question-number">10</span> Do you use a firewall on your network?</p>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q10" value="yes"> Yes</label>
+                        <label class="option"><input type="radio" name="q10" value="no"> No</label>
+                    </div>
+                </div>
+
+                <button>Calculate My Risk Score</button>
+
+            </form>
+        </section>
+
+        <section class="results-section" id="results">
+            <h2>Your Results</h2>
+            <p id="results-placeholder" class="placeholder"><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
+
+            <div class="result-box" id="result-box" style="display: none;">
+                <h3 id="risk-level">Risk Level: —</h3>
+                <p id="risk-summary">—</p>
+
+                <h4>Recommended Fixes</h4>
+                <ul id="checklist"></ul>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Contact: support@netguard.com</p>
+        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
