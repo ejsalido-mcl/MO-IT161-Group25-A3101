@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard – <%= title %></title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image/png" href="/images/Netguard%20Logo.png">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header>
+        <div class="WebsiteLogo">
+            <img src="/images/Netguard%20Logo.png" alt="NetGuard Logo">
+        </div>
+        <h1>NetGuard</h1>
+        <p>Check your Wi-Fi security in just a few minutes.</p>
+        <% const navItems = [
+            { href: '/', label: 'Home', match: ['/'] },
+            { href: '/assessment', label: 'Start Assessment', match: ['/assessment', '/results', '/history'] },
+            { href: '/about', label: 'About Us', match: ['/about'] },
+            { href: '/contact', label: 'Contact Us', match: ['/contact'] }
+        ]; %>
+        <nav aria-label="Main navigation">
+            <% navItems.forEach(function (item) {
+                const on = item.match.some(function (m) { return m === '/' ? currentPath === '/' : (currentPath === m || currentPath.startsWith(m + '/')); }); %>
+                <a href="<%= item.href %>" class="<%= on ? 'active' : '' %>"<%- on ? ' aria-current="page"' : '' %>><%= item.label %></a>
+            <% }); %>
+        </nav>
+    </header>
+
+    <main id="main">
