@@ -1,0 +1,793 @@
+/* ============================================
+   NetGuard — Security Assessment Tool
+   Stylesheet
+   ============================================ */
+
+/* ===== Colors (change them here, they update everywhere) ===== */
+:root {
+    --ink: #0f172a;
+    --text: #334155;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --accent-soft: #eff6ff;
+    --low: #15803d;
+    --low-soft: #f0fdf4;
+    --medium: #a16207;
+    --medium-soft: #fefce8;
+    --high: #b91c1c;
+    --high-soft: #fef2f2;
+    --radius: 10px;
+}
+
+/* ===== Base Styles & Typography ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background-color: var(--bg);
+    margin: 0;
+}
+
+h1, h2, h3, h4 {
+    color: var(--ink);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ===== Layout: every top-level block shares one column ===== */
+body > * {
+    max-width: 1040px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* ===== Header: logo + navigation in one row ===== */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+/* Divider lines line up with the content edges */
+.site-header::after,
+footer::before {
+    content: "";
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    height: 1px;
+    background-color: var(--line);
+}
+
+.site-header::after {
+    bottom: 0;
+}
+
+footer::before {
+    top: 0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+}
+
+.brand-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.brand-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-dark);
+    background-color: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+/* ===== Navigation ===== */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+nav a:hover {
+    color: var(--ink);
+    background-color: #f1f5f9;
+}
+
+/* The page you are on */
+nav a[aria-current="page"] {
+    color: var(--accent-dark);
+    background-color: var(--accent-soft);
+}
+
+/* ===== Sections ===== */
+section {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin: 0 0 24px 0;
+}
+
+section p {
+    margin: 0 0 16px 0;
+}
+
+/* Title area at the top of inner pages */
+.page-intro {
+    padding: 48px 0 40px 0;
+}
+
+.page-intro h1 {
+    font-size: 36px;
+    line-height: 1.15;
+    letter-spacing: -0.8px;
+    margin: 0 0 12px 0;
+}
+
+.page-intro .lead {
+    max-width: 680px;
+}
+
+.eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-dark);
+    background-color: var(--accent-soft);
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+}
+
+.lead {
+    font-size: 17px;
+    color: var(--text);
+}
+
+/* White box used for forms and panels */
+.card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+/* ===== Buttons (work on <a class="button"> and <button>) ===== */
+.button,
+button {
+    display: inline-block;
+    background-color: var(--accent);
+    color: #ffffff;
+    padding: 12px 22px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.button:hover,
+button:hover {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.button-secondary {
+    background-color: transparent;
+    color: var(--ink);
+    border-color: #cbd5e1;
+}
+
+.button-secondary:hover {
+    background-color: var(--surface);
+    border-color: var(--ink);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.btn-danger {
+    background-color: var(--high);
+    border-color: var(--high);
+}
+
+.btn-danger:hover {
+    background-color: #991b1b;
+    border-color: #991b1b;
+}
+
+/* ===== Home: Hero ===== */
+.hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: 48px;
+    padding: 64px 0;
+}
+
+.hero h1 {
+    font-size: 44px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin: 0 0 16px 0;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.hero-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 16px;
+}
+
+.hero-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 14px;
+    box-shadow: 0 20px 40px -20px rgba(15, 23, 42, 0.45);
+}
+
+/* ===== Home: How It Works step cards ===== */
+.steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.steps li {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.step-number,
+.question-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--accent-soft);
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.steps h3 {
+    font-size: 16px;
+    margin: 14px 0 6px 0;
+}
+
+.steps p {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+}
+
+/* ===== Home: Risk score cards & badges ===== */
+.risk-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.risk-card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-top-width: 4px;
+    border-radius: var(--radius);
+    padding: 20px;
+}
+
+.risk-card p {
+    margin: 12px 0 0 0;
+    font-size: 15px;
+}
+
+.risk-card-low    { border-top-color: var(--low); }
+.risk-card-medium { border-top-color: #eab308; }
+.risk-card-high   { border-top-color: var(--high); }
+
+.badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.badge-low    { color: var(--low);    background-color: var(--low-soft); }
+.badge-medium { color: var(--medium); background-color: var(--medium-soft); }
+.badge-high   { color: var(--high);   background-color: var(--high-soft); }
+
+/* Risk level text colors (results page + admin table) */
+.risk-low    { color: var(--low); }
+.risk-medium { color: var(--medium); }
+.risk-high   { color: var(--high); }
+
+/* ===== Home: Tips checklist ===== */
+.tips {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.tips li {
+    position: relative;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px 14px 48px;
+}
+
+.tips li::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    border-radius: 50%;
+    background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m6 10.5 2.5 2.5 5.5-6' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 20px no-repeat;
+}
+
+/* ===== Closing call to action ===== */
+.cta {
+    text-align: center;
+    border-bottom: none;
+}
+
+.cta p {
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 24px auto;
+}
+
+/* ===== Forms ===== */
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 18px;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    background-color: var(--surface);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+form button {
+    margin-top: 24px;
+}
+
+.success-text {
+    color: var(--low);
+    background-color: var(--low-soft);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 16px 0 0 0;
+}
+
+.error-text {
+    color: var(--high);
+    margin: 12px 0 0 0;
+}
+
+/* ===== Assessment: question cards ===== */
+.assessment-form {
+    display: grid;
+    gap: 12px;
+}
+
+.question {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+}
+
+.question-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 14px 0;
+}
+
+.options {
+    display: flex;
+    gap: 10px;
+    padding-left: 44px;
+}
+
+/* Yes / No choices are big clickable boxes */
+label.option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 18px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+label.option:hover {
+    border-color: var(--accent);
+}
+
+label.option:has(input:checked) {
+    border-color: var(--accent);
+    background-color: var(--accent-soft);
+    color: var(--accent-dark);
+}
+
+label.option input {
+    margin: 0;
+    accent-color: var(--accent);
+}
+
+.assessment-form button {
+    justify-self: start;
+    margin-top: 12px;
+}
+
+/* ===== Assessment: results ===== */
+.placeholder {
+    color: var(--muted);
+}
+
+.result-box {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.result-box h3 {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+}
+
+.result-box h4 {
+    margin: 24px 0 8px 0;
+}
+
+#checklist {
+    padding-left: 20px;
+}
+
+#checklist li {
+    margin-bottom: 6px;
+}
+
+/* ===== About: FAQ cards ===== */
+.faq {
+    display: grid;
+    gap: 12px;
+}
+
+.faq article {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+}
+
+.faq h3 {
+    font-size: 17px;
+    margin: 0 0 8px 0;
+}
+
+.faq p {
+    margin: 0;
+}
+
+/* ===== Contact ===== */
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    align-items: start;
+    gap: 24px;
+    border-bottom: none;
+}
+
+.contact-layout form label:first-child {
+    margin-top: 0;
+}
+
+.contact-layout aside h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+/* ===== Login ===== */
+.auth {
+    display: flex;
+    justify-content: center;
+    border-bottom: none;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px;
+}
+
+.auth-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+}
+
+.auth-card h1 {
+    font-size: 26px;
+    margin: 0 0 4px 0;
+}
+
+.auth-card p {
+    color: var(--muted);
+}
+
+.auth-card button {
+    width: 100%;
+}
+
+/* ===== Admin: stats cards ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.stat-number.risk-low    { color: var(--low); }
+.stat-number.risk-medium { color: var(--medium); }
+.stat-number.risk-high   { color: var(--high); }
+
+.stat-label {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* ===== Admin: tables ===== */
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+}
+
+th,
+td {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 14px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #f1f5f9;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+td {
+    color: var(--text);
+}
+
+.actions {
+    white-space: nowrap;
+}
+
+.actions .btn-small {
+    margin: 0 4px 4px 0;
+}
+
+.row-resolved td {
+    opacity: 0.55;
+}
+
+/* ===== Footer ===== */
+footer {
+    padding-top: 32px;
+    padding-bottom: 32px;
+    position: relative;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+}
+
+footer p {
+    margin: 4px 0;
+}
+
+/* ===== Phones & small screens ===== */
+@media (max-width: 760px) {
+    body > * {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .site-header::after,
+    footer::before {
+        left: 16px;
+        right: 16px;
+    }
+
+    .site-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav {
+        gap: 2px;
+        margin-left: -8px;
+    }
+
+    nav a {
+        font-size: 13px;
+        padding: 6px 8px;
+    }
+
+    section {
+        padding: 40px 0;
+    }
+
+    .hero,
+    .contact-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        gap: 32px;
+        padding: 40px 0;
+    }
+
+    .hero h1 {
+        font-size: 34px;
+    }
+
+    .page-intro {
+        padding: 32px 0 28px 0;
+    }
+
+    .page-intro h1 {
+        font-size: 30px;
+    }
+
+    .options {
+        padding-left: 0;
+    }
+}
