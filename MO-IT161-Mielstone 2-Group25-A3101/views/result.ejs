@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+        <section class="results-section" id="results">
+            <h2>Your Results</h2>
+            <div hidden data-clear-draft></div>
+
+            <div class="result-box" id="result-box">
+                <h3 id="risk-level" class="risk-<%= record.riskLevel.toLowerCase() %>">Risk Level: <%= record.riskLevel %></h3>
+                <p id="risk-summary"><%= record.summary %></p>
+                <p class="meta">Taken on <%= formatDate(record.createdAt) %></p>
+
+                <h4>Recommended Fixes</h4>
+                <ul id="checklist">
+                    <% if (record.checklist.length === 0) { %>
+                        <li>Nothing to fix — your setup looks great!</li>
+                    <% } else { record.checklist.forEach(function (item) { %>
+                        <li><%= item %></li>
+                    <% }); } %>
+                </ul>
+            </div>
+
+            <p>
+                <a href="/assessment"><button type="button">Retake Assessment</button></a>
+                <a href="/history"><button type="button" class="btn-secondary">My Past Results</button></a>
+            </p>
+        </section>
+<%- include('partials/footer') %>
