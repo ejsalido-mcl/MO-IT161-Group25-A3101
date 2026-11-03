@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard – Admin Login</title>
+    <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="brand">
+            <img src="images/shield.svg" alt="" class="brand-icon">
+            <span>NetGuard</span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="assessment.html">Start Assessment</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="auth">
+            <div class="card auth-card">
+                <img src="images/shield.svg" alt="" class="auth-icon">
+                <h1>Admin Login</h1>
+                <p>Log in to view messages and assessment results.</p>
+                <form id="login-form">
+                    <label for="admin-password">Password:</label>
+                    <input type="password" id="admin-password" placeholder="Enter admin password" required>
+                    <button>Log In</button>
+                </form>
+                <p id="login-error" class="error-text" style="display: none;"></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Contact: support@netguard.com</p>
+        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
