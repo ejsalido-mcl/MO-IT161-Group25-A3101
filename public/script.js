@@ -332,3 +332,39 @@ if (loginForm) {
         });
     });
 }
+// ==========================================
+// ADVANCED METHODS: Validation & Caching System
+// ==========================================
+const NetGuardValidator = {
+    validateEmail: (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(String(email).toLowerCase());
+    },
+    sanitizeInput: (str) => {
+        return str.replace(/[&<>"']/g, (match) => {
+            const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return escapeMap[match];
+        });
+    }
+};
+
+const NetGuardStorage = {
+    STORAGE_KEY: 'netguard_assessment_history',
+    saveAssessment: (scoreData) => {
+        const history = NetGuardStorage.getHistory();
+        const newRecord = { id: Date.now(), date: new Date().toISOString(), ...scoreData };
+        history.unshift(newRecord);
+        localStorage.setItem(NetGuardStorage.STORAGE_KEY, JSON.stringify(history.slice(0, 10)));
+        return newRecord;
+    },
+    getHistory: () => {
+        const raw = localStorage.getItem(NetGuardStorage.STORAGE_KEY);
+        try { return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
+    },
+    calculateAverageRiskScore: () => {
+        const history = NetGuardStorage.getHistory();
+        if (history.length === 0) return 0;
+        const total = history.reduce((sum, item) => sum + (item.score || 0), 0);
+        return (total / history.length).toFixed(1);
+    }
+};
