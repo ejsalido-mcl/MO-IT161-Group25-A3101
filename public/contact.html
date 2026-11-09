@@ -48,19 +48,19 @@
                         <form id="contact-form">
                             <div class="mb-3">
                                 <label for="contact-name" class="form-label">Your Name:</label>
-                                <input type="text" class="form-control" id="contact-name" placeholder="Enter your name">
+                                <input type="text" class="form-control" id="contact-name" maxlength="100" placeholder="Enter your name">
                             </div>
                             <div class="mb-3">
                                 <label for="contact-email" class="form-label">Email Address:</label>
-                                <input type="email" class="form-control" id="contact-email" placeholder="Enter your email">
+                                <input type="email" class="form-control" id="contact-email" maxlength="254" placeholder="Enter your email">
                             </div>
                             <div class="mb-3">
                                 <label for="contact-subject" class="form-label">Subject:</label>
-                                <input type="text" class="form-control" id="contact-subject" placeholder="What is this about?">
+                                <input type="text" class="form-control" id="contact-subject" maxlength="150" placeholder="What is this about?">
                             </div>
                             <div class="mb-4">
                                 <label for="contact-text" class="form-label">Message:</label>
-                                <textarea class="form-control" id="contact-text" rows="5" placeholder="Describe your concern or question."></textarea>
+                                <textarea class="form-control" id="contact-text" rows="5" maxlength="2000" placeholder="Describe your concern or question."></textarea>
                             </div>
                             <button type="submit" class="btn btn-primary">Send Message</button>
                         </form>

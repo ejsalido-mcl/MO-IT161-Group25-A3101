@@ -178,8 +178,14 @@ if (contactForm) {
             body: JSON.stringify(contactData)
         })
         .then(response => {
-            if (!response.ok) throw new Error("Server responded with " + response.status);
-            return response.json();
+            return response.json().catch(() => ({})).then(data => {
+                if (!response.ok) {
+                    const err = new Error(data.error || "Server responded with " + response.status);
+                    err.fromServer = Boolean(data.error);
+                    throw err;
+                }
+                return data;
+            });
         })
         .then(data => {
             // 4. Show success message
@@ -190,7 +196,7 @@ if (contactForm) {
         })
         .catch(error => {
             console.error("Contact form error:", error);
-            alert("Sorry, your message couldn't be sent. Please try again later.");
+            alert(error.fromServer ? error.message : "Sorry, your message couldn't be sent. Please try again later.");
         })
         .finally(() => {
             if (submitBtn) submitBtn.disabled = false;
@@ -332,11 +338,18 @@ if (loginForm) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ password })
         }).then(response => {
-            if (response.ok) window.location.href = "/admin";
-            else {
-                errorText.textContent = "Wrong password. Please try again.";
-                errorText.style.display = "block";
+            if (response.ok) {
+                window.location.href = "/admin";
+                return;
             }
+            // Show the server's reason (wrong password, too many attempts, ...)
+            return response.json().catch(() => ({})).then(data => {
+                errorText.textContent = data.error || "Login failed. Please try again.";
+                errorText.style.display = "block";
+            });
+        }).catch(() => {
+            errorText.textContent = "Could not reach the server. Please try again.";
+            errorText.style.display = "block";
         });
     });
 }
