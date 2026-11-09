@@ -132,10 +132,11 @@ function showResults(riskLevel, checklist, safeAnswers) {
     // Build checklist
     checklistEl.innerHTML = "";
     if (checklist.length === 0) {
-        checklistEl.innerHTML = "<li>Nothing to fix — your setup looks great!</li>";
+        checklistEl.innerHTML = '<li class="list-group-item">Nothing to fix — your setup looks great!</li>';
     } else {
         checklist.forEach((item) => {
             const li = document.createElement("li");
+            li.className = "list-group-item";
             li.textContent = item;
             checklistEl.appendChild(li);
         });
@@ -224,7 +225,7 @@ function loadMessages() {
             messagesContainer.innerHTML = "<p>No messages yet.</p>";
             return;
         }
-        let html = `<table><tr><th>Date</th><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr>`;
+        let html = `<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Date</th><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
         messages.forEach(msg => {
             const resolved = msg.status === "resolved";
             const id = escapeHTML(msg.id);
@@ -233,16 +234,16 @@ function loadMessages() {
                 <td>${escapeHTML(msg.name)}</td>
                 <td>${escapeHTML(msg.email)}</td>
                 <td>${escapeHTML(msg.message)}</td>
-                <td>${resolved ? "Resolved" : "New"}</td>
+                <td><span class="badge rounded-pill ${resolved ? "text-bg-secondary" : "text-bg-primary"}">${resolved ? "Resolved" : "New"}</span></td>
                 <td class="actions">
-                    <button class="btn-small" data-action="toggle" data-id="${id}" data-status="${resolved ? "new" : "resolved"}">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle" data-id="${id}" data-status="${resolved ? "new" : "resolved"}">
                         ${resolved ? "Mark as new" : "Mark resolved"}
                     </button>
-                    <button class="btn-small btn-danger" data-action="delete" data-id="${id}">Delete</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${id}">Delete</button>
                 </td>
             </tr>`;
         });
-        html += "</table>";
+        html += "</tbody></table>";
         messagesContainer.innerHTML = html;
     }).catch(error => {
         if (error.message !== "Not logged in") messagesContainer.innerHTML = "<p>Could not load messages.</p>";
@@ -276,13 +277,20 @@ function showStats(results) {
     const average = total ? (results.reduce((sum, r) => sum + Number(r.score || 0), 0) / total).toFixed(1) + "/10" : "—";
     const count = level => results.filter(r => r.riskLevel === level).length;
 
-    statsContainer.innerHTML = `
-        <div class="stat-card"><span class="stat-number">${total}</span><span class="stat-label">Assessments taken</span></div>
-        <div class="stat-card"><span class="stat-number">${average}</span><span class="stat-label">Average score</span></div>
-        <div class="stat-card"><span class="stat-number risk-low">${count("Low")}</span><span class="stat-label">Low risk</span></div>
-        <div class="stat-card"><span class="stat-number risk-medium">${count("Medium")}</span><span class="stat-label">Medium risk</span></div>
-        <div class="stat-card"><span class="stat-number risk-high">${count("High")}</span><span class="stat-label">High risk</span></div>
-    `;
+    const card = (value, label, extraClass = "") => `
+        <div class="col-6 col-md-4 col-lg">
+            <div class="card stat-card h-100"><div class="card-body">
+                <span class="stat-number ${extraClass}">${value}</span>
+                <span class="stat-label">${label}</span>
+            </div></div>
+        </div>`;
+
+    statsContainer.innerHTML =
+        card(total, "Assessments taken") +
+        card(average, "Average score") +
+        card(count("Low"), "Low risk", "risk-low") +
+        card(count("Medium"), "Medium risk", "risk-medium") +
+        card(count("High"), "High risk", "risk-high");
 }
 
 if (resultsContainer) {
@@ -292,12 +300,12 @@ if (resultsContainer) {
             resultsContainer.innerHTML = "<p>No assessments taken yet.</p>";
             return;
         }
-        let html = "<table><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr>";
+        let html = '<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr></thead><tbody>';
         results.forEach(result => {
             const level = escapeHTML(result.riskLevel);
-            html += `<tr><td>${escapeHTML(result.date)}</td><td class="risk-${level.toLowerCase()}">${level}</td><td>${escapeHTML(result.score)}/10</td></tr>`;
+            html += `<tr><td>${escapeHTML(result.date)}</td><td><span class="badge rounded-pill badge-${level.toLowerCase()}">${level}</span></td><td>${escapeHTML(result.score)}/10</td></tr>`;
         });
-        html += "</table>";
+        html += "</tbody></table>";
         resultsContainer.innerHTML = html;
     }).catch(error => {
         if (error.message !== "Not logged in") resultsContainer.innerHTML = "<p>Could not load results.</p>";

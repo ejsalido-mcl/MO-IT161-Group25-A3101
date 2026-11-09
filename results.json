@@ -2,6 +2,13 @@
   {
     "riskLevel": "Medium",
     "score": 6,
-    "date": "10/20/2026, 8:15:01 AM"
+    "date": "10/20/2026, 8:15:01 AM",
+    "id": "be0161bc-e301-477f-bcac-03fa6d6a586a"
+  },
+  {
+    "id": "b9ea2c09-d3bb-4c3d-949c-eb4e964527e6",
+    "riskLevel": "High",
+    "score": 3,
+    "date": "11/9/2026, 4:25:27 PM"
   }
 ]
