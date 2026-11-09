@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard – Admin Dashboard</title>
+    <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="brand">
+            <img src="images/shield.svg" alt="" class="brand-icon">
+            <span>NetGuard <small class="brand-tag">Admin</small></span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="assessment.html">Start Assessment</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="/admin" aria-current="page">Admin</a>
+            <button id="logout-button" class="btn-small button-secondary">Log out</button>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="page-intro">
+            <h1>Admin Dashboard</h1>
+            <p class="lead">View saved contact messages and assessment results.</p>
+        </section>
+
+        <section>
+            <h2>Overview</h2>
+            <div id="stats-container" class="stats-grid">Loading stats...</div>
+        </section>
+
+        <section>
+            <h2>Received Messages</h2>
+            <div id="messages-container" class="table-wrap">Loading messages...</div>
+        </section>
+
+        <section>
+            <h2>Assessment History</h2>
+            <div id="results-container" class="table-wrap">Loading results...</div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Contact: support@netguard.com</p>
+        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
