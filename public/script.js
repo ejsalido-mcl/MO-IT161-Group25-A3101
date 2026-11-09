@@ -88,6 +88,7 @@ if (assessmentForm) {
         .then(response => response.json())
         .then(data => {
             console.log("Backend says:", data.message);
+            if (data.id) showShareLink(data.id);
         })
         .catch(error => {
             console.error("Error saving to backend:", error);
@@ -142,8 +143,80 @@ function showResults(riskLevel, checklist, safeAnswers) {
         });
     }
 
+    // Hide any link from a previous attempt until the new one is saved
+    const shareBox = document.getElementById("share-box");
+    if (shareBox) shareBox.style.display = "none";
+
     // Scroll to results
     resultBox.scrollIntoView({ behavior: "smooth" });
+}
+
+// ===== RESULT LINK (shown after the result is saved) =====
+
+function showShareLink(id) {
+    const shareBox = document.getElementById("share-box");
+    const shareInput = document.getElementById("share-link");
+    if (!shareBox || !shareInput) return;
+
+    shareInput.value = `${window.location.origin}/result?id=${encodeURIComponent(id)}`;
+    shareBox.style.display = "block";
+}
+
+const copyLinkButton = document.getElementById("copy-link");
+if (copyLinkButton) {
+    copyLinkButton.addEventListener("click", function () {
+        const shareInput = document.getElementById("share-link");
+        const done = () => {
+            copyLinkButton.textContent = "Copied!";
+            setTimeout(() => { copyLinkButton.textContent = "Copy link"; }, 2000);
+        };
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareInput.value).then(done).catch(() => shareInput.select());
+        } else {
+            shareInput.select(); // older browsers: select it so the user can copy
+        }
+    });
+}
+
+// ===== SAVED RESULT PAGE (/result?id=...) =====
+
+const savedResult = document.getElementById("saved-result");
+if (savedResult) {
+    const id = new URLSearchParams(window.location.search).get("id");
+    const statusEl = document.getElementById("saved-status");
+
+    const showError = message => {
+        statusEl.textContent = message;
+        statusEl.className = "alert alert-warning";
+    };
+
+    if (!id) {
+        showError("No result link was given. Take the assessment to get your own link.");
+    } else {
+        fetch("/api/results/" + encodeURIComponent(id))
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) return showError(data.error || "This result could not be found.");
+
+                const level = data.riskLevel;
+                const levelEl = document.getElementById("saved-level");
+                levelEl.textContent = `Risk Level: ${level}`;
+                levelEl.className = `risk-${level.toLowerCase()}`;
+
+                const summaries = {
+                    Low: "Your Wi-Fi setup is fairly secure.",
+                    Medium: "Some settings could be improved.",
+                    High: "Your network may be vulnerable."
+                };
+                document.getElementById("saved-summary").textContent =
+                    `You scored ${data.score}/10. ${summaries[level] || ""}`;
+                document.getElementById("saved-date").textContent = `Taken on ${data.date}`;
+
+                statusEl.style.display = "none";
+                savedResult.style.display = "block";
+            })
+            .catch(() => showError("Could not reach the server. Please try again."));
+    }
 }
 
 // ===== CONTACT FORM =====

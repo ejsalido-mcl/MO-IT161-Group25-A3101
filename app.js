@@ -12,6 +12,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "netguard-admin";
 const MESSAGES_FILE = path.join(__dirname, "messages.json");
 const RESULTS_FILE = path.join(__dirname, "results.json");
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Longest value we accept for each contact form field
 const LIMITS = { name: 100, email: 254, subject: 150, message: 2000 };
@@ -146,6 +147,7 @@ app.get("/login", (req, res) => {
     if (req.session.isAdmin) return res.redirect("/admin");
     res.sendFile(path.join(__dirname, "public", "login.html"));
 });
+app.get("/result", (req, res) => res.sendFile(path.join(__dirname, "public", "result.html")));
 app.get("/admin", requireAdmin, (req, res) => {
     res.sendFile(path.join(__dirname, "private", "admin.html"));
 });
@@ -248,17 +250,34 @@ app.post("/save-result", (req, res) => {
     }
 
     const results = readData(RESULTS_FILE);
+    const id = crypto.randomUUID();
     results.push({
-        id: crypto.randomUUID(),
+        id,
         riskLevel,
         score,
         date: new Date().toLocaleString()
     });
     writeData(RESULTS_FILE, results);
-    res.json({ message: "Assessment saved successfully!" });
+    // The id lets the user come back to this result later at /result?id=...
+    res.json({ message: "Assessment saved successfully!", id });
 });
 
+// Admins see every result
 app.get("/api/results", requireAdmin, (req, res) => res.json(readData(RESULTS_FILE)));
+
+// Anyone with the link can see ONE result. The id is a random UUID,
+// so results can't be guessed or listed by other visitors.
+app.get("/api/results/:id", (req, res) => {
+    const id = req.params.id.toLowerCase();
+    if (!UUID_PATTERN.test(id)) {
+        return res.status(400).json({ error: "Invalid result link." });
+    }
+    const result = readData(RESULTS_FILE).find(r => r.id === id);
+    if (!result) return res.status(404).json({ error: "Result not found." });
+
+    const { riskLevel, score, date } = result;
+    res.json({ riskLevel, score, date });
+});
 
 // --- ERROR HANDLING ---
 
