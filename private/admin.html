@@ -49,13 +49,54 @@
         </section>
 
         <section>
-            <h2>Received Messages</h2>
+            <div class="section-head">
+                <h2>Received Messages</h2>
+                <a id="messages-export" class="btn btn-sm btn-outline-secondary" href="/api/messages/export" download>Export CSV</a>
+            </div>
+            <form id="messages-filters" class="row g-2 filter-bar" role="search" aria-label="Filter messages">
+                <div class="col-sm-4 col-md-3">
+                    <label for="messages-status" class="form-label">Status</label>
+                    <select id="messages-status" name="status" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="new">New</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="col-sm-8 col-md-5">
+                    <label for="messages-search" class="form-label">Search</label>
+                    <input type="search" id="messages-search" name="q" class="form-control form-control-sm" maxlength="100" placeholder="Name, email, subject or message">
+                </div>
+            </form>
             <div id="messages-container" class="table-responsive">Loading messages...</div>
+            <div id="messages-pager"></div>
         </section>
 
         <section class="border-0">
-            <h2>Assessment History</h2>
+            <div class="section-head">
+                <h2>Assessment History</h2>
+                <a id="results-export" class="btn btn-sm btn-outline-secondary" href="/api/results/export" download>Export CSV</a>
+            </div>
+            <form id="results-filters" class="row g-2 filter-bar" role="search" aria-label="Filter results">
+                <div class="col-sm-4 col-md-3">
+                    <label for="results-level" class="form-label">Risk level</label>
+                    <select id="results-level" name="riskLevel" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    <label for="results-from" class="form-label">From</label>
+                    <input type="date" id="results-from" name="from" class="form-control form-control-sm">
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    <label for="results-to" class="form-label">To</label>
+                    <input type="date" id="results-to" name="to" class="form-control form-control-sm">
+                </div>
+            </form>
             <div id="results-container" class="table-responsive">Loading results...</div>
+            <div id="results-pager"></div>
         </section>
 
     </main>

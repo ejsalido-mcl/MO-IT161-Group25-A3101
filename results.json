@@ -70,5 +70,25 @@
     "riskLevel": "High",
     "score": 2,
     "date": "11/9/2026, 6:16:20 PM"
+  },
+  {
+    "id": "64356baf-d840-4ab8-9bb8-60ad10c7987b",
+    "riskLevel": "Low",
+    "score": 8,
+    "date": "11/9/2026, 6:23:15 PM"
+  },
+  {
+    "id": "c54cc8fd-9e4b-407f-81bd-8e227517f2d9",
+    "riskLevel": "Medium",
+    "score": 5,
+    "date": "11/9/2026, 6:30:58 PM",
+    "createdAt": "2026-11-09T10:30:58.436Z"
+  },
+  {
+    "id": "fce5b6b3-961c-4f3c-8822-c1bf6efccb43",
+    "riskLevel": "Medium",
+    "score": 6,
+    "date": "11/9/2026, 6:46:05 PM",
+    "createdAt": "2026-11-09T10:46:05.392Z"
   }
 ]

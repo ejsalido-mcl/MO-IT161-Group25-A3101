@@ -103,6 +103,123 @@ function riskLevelForScore(score) {
     return "High";
 }
 
+// --- LIST HELPERS (filtering, paging, CSV) ---
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD from <input type="date">
+
+// When a record was created, as a timestamp. Old records only have the
+// display date ("11/9/2026, 4:25:27 PM"); new ones also store createdAt (ISO).
+function recordTime(item) {
+    const time = Date.parse(item.createdAt || item.date);
+    return Number.isNaN(time) ? 0 : time;
+}
+
+function newestFirst(a, b) {
+    return recordTime(b) - recordTime(a);
+}
+
+// One query value as text: "" when missing, null when sent more than once (?a=1&a=2)
+function queryText(value) {
+    if (value === undefined) return "";
+    if (typeof value !== "string") return null;
+    return value.trim();
+}
+
+// ?page=2&limit=10 -> { page, limit } or { error }
+function readPaging(query) {
+    const page = query.page === undefined ? 1 : Number(query.page);
+    const limit = query.limit === undefined ? 10 : Number(query.limit);
+    if (!Number.isInteger(page) || page < 1) return { error: "page must be a whole number of 1 or more." };
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) return { error: "limit must be a whole number from 1 to 100." };
+    return { page, limit };
+}
+
+function paginate(items, { page, limit }) {
+    const total = items.length;
+    return {
+        items: items.slice((page - 1) * limit, page * limit),
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit))
+    };
+}
+
+// ?status=new&q=router -> { items } or { error }
+function filterMessages(query) {
+    const status = queryText(query.status);
+    const search = queryText(query.q);
+    if (status === null || (status && !["new", "resolved"].includes(status))) {
+        return { error: "status must be new or resolved." };
+    }
+    if (search === null || search.length > 100) {
+        return { error: "Search text must be 100 characters or fewer." };
+    }
+
+    const needle = search.toLowerCase();
+    const items = readData(MESSAGES_FILE)
+        .filter(m => !status || (m.status || "new") === status)
+        .filter(m => !needle || [m.name, m.email, m.subject, m.message]
+            .some(field => String(field || "").toLowerCase().includes(needle)))
+        .sort(newestFirst);
+    return { items };
+}
+
+// ?riskLevel=High&from=2026-11-01&to=2026-11-30 -> { items } or { error }
+function filterResults(query) {
+    const riskLevel = queryText(query.riskLevel);
+    const from = queryText(query.from);
+    const to = queryText(query.to);
+
+    if (riskLevel === null || (riskLevel && !["Low", "Medium", "High"].includes(riskLevel))) {
+        return { error: "riskLevel must be Low, Medium or High." };
+    }
+    for (const [name, value] of [["from", from], ["to", to]]) {
+        if (value === null || (value && (!DATE_PATTERN.test(value) || Number.isNaN(Date.parse(value))))) {
+            return { error: `${name} must be a date like 2026-11-09.` };
+        }
+    }
+
+    // Whole days in the server's local time, the same clock the dates were saved with
+    const fromTime = from ? new Date(from + "T00:00:00").getTime() : -Infinity;
+    const toTime = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
+    if (fromTime > toTime) return { error: "The from date must be on or before the to date." };
+
+    const items = readData(RESULTS_FILE)
+        .filter(r => !riskLevel || r.riskLevel === riskLevel)
+        .filter(r => {
+            const time = recordTime(r);
+            return time >= fromTime && time <= toTime;
+        })
+        .sort(newestFirst);
+    return { items };
+}
+
+// One CSV cell. Cells starting with = + - @ get a ' in front so Excel/Sheets
+// treat them as text, not formulas (contact messages are typed by visitors).
+function csvCell(value) {
+    let text = String(value ?? "");
+    if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function sendCsv(res, name, header, rows) {
+    const today = localDateKey(new Date());
+    const lines = [header, ...rows].map(row => row.map(csvCell).join(","));
+    res.set({
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="netguard-${name}-${today}.csv"`
+    });
+    // The BOM at the start makes Excel open the file as UTF-8
+    res.send("﻿" + lines.join("\r\n") + "\r\n");
+}
+
+// A Date as YYYY-MM-DD in local time
+function localDateKey(date) {
+    const pad = n => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
 // Compare passwords without leaking timing information
 function passwordMatches(input) {
     const a = crypto.createHash("sha256").update(input).digest();
@@ -207,13 +324,33 @@ app.post("/contact", (req, res) => {
         id: crypto.randomUUID(),
         ...fields,
         status: "new",
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        createdAt: new Date().toISOString()
     });
     writeData(MESSAGES_FILE, messages);
     res.json({ message: "Message saved successfully!" });
 });
 
-app.get("/api/messages", requireAdmin, (req, res) => res.json(readData(MESSAGES_FILE)));
+// Newest first. Optional filters: ?status=new|resolved &q=search text
+// Paging: ?page=1 &limit=10 (max 100)
+app.get("/api/messages", requireAdmin, (req, res) => {
+    const paging = readPaging(req.query);
+    if (paging.error) return res.status(400).json({ error: paging.error });
+    const filtered = filterMessages(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    res.json(paginate(filtered.items, paging));
+});
+
+// Same filters as the list, every matching row, as a CSV download
+app.get("/api/messages/export", requireAdmin, (req, res) => {
+    const filtered = filterMessages(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    sendCsv(res, "messages",
+        ["Date", "Name", "Email", "Subject", "Message", "Status"],
+        filtered.items.map(m => [m.date, m.name, m.email, m.subject, m.message, m.status || "new"]));
+});
 
 app.patch("/api/messages/:id", requireAdmin, (req, res) => {
     const { status } = req.body;
@@ -255,15 +392,78 @@ app.post("/save-result", (req, res) => {
         id,
         riskLevel,
         score,
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        createdAt: new Date().toISOString()
     });
     writeData(RESULTS_FILE, results);
     // The id lets the user come back to this result later at /result?id=...
     res.json({ message: "Assessment saved successfully!", id });
 });
 
-// Admins see every result
-app.get("/api/results", requireAdmin, (req, res) => res.json(readData(RESULTS_FILE)));
+// Admins see every result, newest first.
+// Optional filters: ?riskLevel=Low|Medium|High &from=YYYY-MM-DD &to=YYYY-MM-DD
+// Paging: ?page=1 &limit=10 (max 100)
+app.get("/api/results", requireAdmin, (req, res) => {
+    const paging = readPaging(req.query);
+    if (paging.error) return res.status(400).json({ error: paging.error });
+    const filtered = filterResults(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    res.json(paginate(filtered.items, paging));
+});
+
+// Same filters as the list, every matching row, as a CSV download.
+// (Must come before /api/results/:id, or "export" would be read as an id.)
+app.get("/api/results/export", requireAdmin, (req, res) => {
+    const filtered = filterResults(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    sendCsv(res, "results",
+        ["Date", "Risk Level", "Score"],
+        filtered.items.map(r => [r.date, r.riskLevel, r.score]));
+});
+
+// --- BACKEND FEATURE 3: Dashboard statistics ---
+app.get("/api/stats", requireAdmin, (req, res) => {
+    const results = readData(RESULTS_FILE);
+    const messages = readData(MESSAGES_FILE);
+
+    const total = results.length;
+    const scoreSum = results.reduce((sum, r) => sum + Number(r.score || 0), 0);
+    const byLevel = { Low: 0, Medium: 0, High: 0 };
+    results.forEach(r => {
+        if (r.riskLevel in byLevel) byLevel[r.riskLevel]++;
+    });
+
+    // Assessments per day for the last 14 days, oldest first (for a trend chart)
+    const last14Days = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 13; i >= 0; i--) {
+        const day = new Date(today);
+        day.setDate(day.getDate() - i);
+        last14Days.push({ date: localDateKey(day), count: 0 });
+    }
+    results.forEach(r => {
+        const day = last14Days.find(d => d.date === localDateKey(new Date(recordTime(r))));
+        if (day) day.count++;
+    });
+
+    const resolved = messages.filter(m => m.status === "resolved").length;
+    res.json({
+        assessments: {
+            total,
+            averageScore: total ? Math.round((scoreSum / total) * 10) / 10 : null,
+            byLevel,
+            last14Days
+        },
+        messages: {
+            total: messages.length,
+            new: messages.length - resolved,
+            resolved
+        }
+    });
+});
 
 // Anyone with the link can see ONE result. The id is a random UUID,
 // so results can't be guessed or listed by other visitors.

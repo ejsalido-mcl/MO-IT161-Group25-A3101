@@ -404,6 +404,35 @@ section h2 {
     color: var(--muted);
 }
 
+/* ===== Admin: section header, filters, pager ===== */
+.section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.section-head h2 {
+    margin: 0;
+}
+
+.filter-bar {
+    margin-bottom: 16px;
+}
+
+.filter-bar .form-label {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.pagination {
+    --bs-pagination-active-bg: var(--accent);
+    --bs-pagination-active-border-color: var(--accent);
+    --bs-pagination-color: var(--accent-dark);
+}
+
 /* ===== Admin: tables ===== */
 .table-responsive {
     background-color: var(--surface);

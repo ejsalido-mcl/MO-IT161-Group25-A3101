@@ -289,105 +289,226 @@ function adminFetch(url, options) {
             window.location.href = "/login";
             throw new Error("Not logged in");
         }
-        if (!response.ok) throw new Error("Server responded with " + response.status);
-        return response.json();
+        return response.json().catch(() => ({})).then(data => {
+            if (!response.ok) throw new Error(data.error || "Server responded with " + response.status);
+            return data;
+        });
     });
 }
 
-const messagesContainer = document.getElementById("messages-container");
-const resultsContainer = document.getElementById("results-container");
+const PAGE_SIZE = 10;
+
+// "Showing 11–20 of 34" plus Previous / page numbers / Next
+function renderPager(pagerEl, data, goToPage) {
+    if (data.total === 0) {
+        pagerEl.innerHTML = "";
+        return;
+    }
+    const first = (data.page - 1) * data.limit + 1;
+    const last = Math.min(data.page * data.limit, data.total);
+    let html = `<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+        <span class="small text-body-secondary">Showing ${first}–${last} of ${data.total}</span>`;
+
+    if (data.totalPages > 1) {
+        const button = (page, label, { disabled = false, active = false } = {}) => `
+            <li class="page-item${disabled ? " disabled" : ""}${active ? " active" : ""}">
+                <button type="button" class="page-link" data-page="${page}"${disabled ? " disabled" : ""}${active ? ' aria-current="page"' : ""}>${label}</button>
+            </li>`;
+        const gap = '<li class="page-item disabled"><span class="page-link">…</span></li>';
+
+        html += '<nav aria-label="Pages"><ul class="pagination pagination-sm mb-0">';
+        html += button(data.page - 1, "Previous", { disabled: data.page === 1 });
+        // Always show the first and last page, plus two pages either side of the current one
+        for (let p = 1; p <= data.totalPages; p++) {
+            const nearCurrent = Math.abs(p - data.page) <= 2;
+            if (p === 1 || p === data.totalPages || nearCurrent) {
+                html += button(p, p, { active: p === data.page });
+            } else if (p === data.page - 3 || p === data.page + 3) {
+                html += gap;
+            }
+        }
+        html += button(data.page + 1, "Next", { disabled: data.page === data.totalPages });
+        html += "</ul></nav>";
+    }
+    pagerEl.innerHTML = html + "</div>";
+    pagerEl.onclick = event => {
+        const target = event.target.closest("button[data-page]");
+        if (target && !target.disabled) goToPage(Number(target.dataset.page));
+    };
+}
+
+// Wires one admin table to its filter form, pager and Export CSV link.
+// Returns { reload } so other code can refresh it after a change.
+function setupAdminList({ endpoint, form, container, pager, exportLink, renderRows, emptyText, noMatchText }) {
+    let page = 1;
+
+    function filterParams() {
+        const params = new URLSearchParams();
+        new FormData(form).forEach((value, key) => {
+            const text = String(value).trim();
+            if (text) params.set(key, text);
+        });
+        return params;
+    }
+
+    function load() {
+        const params = filterParams();
+        const hasFilters = params.toString() !== "";
+        // Export downloads every row that matches the current filters (no paging)
+        exportLink.href = `${endpoint}/export${hasFilters ? "?" + params : ""}`;
+
+        params.set("page", page);
+        params.set("limit", PAGE_SIZE);
+        adminFetch(`${endpoint}?${params}`).then(data => {
+            // A delete can empty the last page; step back to the new last page
+            if (data.items.length === 0 && page > 1) {
+                page = data.totalPages;
+                return load();
+            }
+            container.innerHTML = data.items.length
+                ? renderRows(data.items)
+                : `<p class="p-3 mb-0 text-body-secondary">${hasFilters ? noMatchText : emptyText}</p>`;
+            renderPager(pager, data, newPage => {
+                page = newPage;
+                load();
+                container.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            });
+        }).catch(error => {
+            if (error.message === "Not logged in") return;
+            container.innerHTML = `<p class="p-3 mb-0 text-danger">${escapeHTML(error.message)}</p>`;
+            pager.innerHTML = "";
+        });
+    }
+
+    // Re-run the search shortly after the admin stops typing / changes a filter
+    let timer;
+    const onFilterChange = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { page = 1; load(); }, 300);
+    };
+    form.addEventListener("input", onFilterChange);
+    form.addEventListener("change", onFilterChange);
+    form.addEventListener("submit", event => event.preventDefault());
+
+    load();
+    return { reload: load };
+}
+
+// ----- Overview stats (from /api/stats) -----
+
 const statsContainer = document.getElementById("stats-container");
 
-function loadMessages() {
-    adminFetch("/api/messages").then(messages => {
-        if (messages.length === 0) {
-            messagesContainer.innerHTML = "<p>No messages yet.</p>";
-            return;
-        }
-        let html = `<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Date</th><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
-        messages.forEach(msg => {
-            const resolved = msg.status === "resolved";
-            const id = escapeHTML(msg.id);
-            html += `<tr class="${resolved ? "row-resolved" : ""}">
-                <td>${escapeHTML(msg.date || "—")}</td>
-                <td>${escapeHTML(msg.name)}</td>
-                <td>${escapeHTML(msg.email)}</td>
-                <td>${escapeHTML(msg.message)}</td>
-                <td><span class="badge rounded-pill ${resolved ? "text-bg-secondary" : "text-bg-primary"}">${resolved ? "Resolved" : "New"}</span></td>
-                <td class="actions">
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle" data-id="${id}" data-status="${resolved ? "new" : "resolved"}">
-                        ${resolved ? "Mark as new" : "Mark resolved"}
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${id}">Delete</button>
-                </td>
-            </tr>`;
-        });
-        html += "</tbody></table>";
-        messagesContainer.innerHTML = html;
+function loadStats() {
+    if (!statsContainer) return;
+    adminFetch("/api/stats").then(stats => {
+        const a = stats.assessments;
+        const card = (value, label, extraClass = "") => `
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card stat-card h-100"><div class="card-body">
+                    <span class="stat-number ${extraClass}">${escapeHTML(value)}</span>
+                    <span class="stat-label">${label}</span>
+                </div></div>
+            </div>`;
+
+        statsContainer.innerHTML =
+            card(a.total, "Assessments taken") +
+            card(a.averageScore === null ? "—" : `${a.averageScore}/10`, "Average score") +
+            card(a.byLevel.Low, "Low risk", "risk-low") +
+            card(a.byLevel.Medium, "Medium risk", "risk-medium") +
+            card(a.byLevel.High, "High risk", "risk-high") +
+            card(stats.messages.new, "New messages");
     }).catch(error => {
-        if (error.message !== "Not logged in") messagesContainer.innerHTML = "<p>Could not load messages.</p>";
+        if (error.message !== "Not logged in") statsContainer.innerHTML = '<p class="text-danger">Could not load stats.</p>';
     });
 }
 
+loadStats();
+
+// ----- Received messages -----
+
+const messagesContainer = document.getElementById("messages-container");
+
 if (messagesContainer) {
-    loadMessages();
+    const messagesList = setupAdminList({
+        endpoint: "/api/messages",
+        form: document.getElementById("messages-filters"),
+        container: messagesContainer,
+        pager: document.getElementById("messages-pager"),
+        exportLink: document.getElementById("messages-export"),
+        emptyText: "No messages yet.",
+        noMatchText: "No messages match these filters.",
+        renderRows: messages => {
+            let html = `<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Date</th><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+            messages.forEach(msg => {
+                const resolved = msg.status === "resolved";
+                const id = escapeHTML(msg.id);
+                const subject = msg.subject ? `<strong>${escapeHTML(msg.subject)}</strong><br>` : "";
+                html += `<tr class="${resolved ? "row-resolved" : ""}">
+                    <td>${escapeHTML(msg.date || "—")}</td>
+                    <td>${escapeHTML(msg.name)}</td>
+                    <td>${escapeHTML(msg.email)}</td>
+                    <td>${subject}${escapeHTML(msg.message)}</td>
+                    <td><span class="badge rounded-pill ${resolved ? "text-bg-secondary" : "text-bg-primary"}">${resolved ? "Resolved" : "New"}</span></td>
+                    <td class="actions">
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-action="toggle" data-id="${id}" data-status="${resolved ? "new" : "resolved"}">
+                            ${resolved ? "Mark as new" : "Mark resolved"}
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete" data-id="${id}">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            return html + "</tbody></table>";
+        }
+    });
+
+    const afterChange = () => {
+        messagesList.reload();
+        loadStats(); // the "New messages" count may have changed
+    };
+
     messagesContainer.addEventListener("click", function (event) {
         const button = event.target.closest("button[data-action]");
         if (!button) return;
         const url = "/api/messages/" + encodeURIComponent(button.dataset.id);
+        const failed = error => {
+            if (error.message !== "Not logged in") alert("Could not update the message: " + error.message);
+        };
 
         if (button.dataset.action === "delete") {
             if (!confirm("Delete this message?")) return;
-            adminFetch(url, { method: "DELETE" }).then(loadMessages);
+            adminFetch(url, { method: "DELETE" }).then(afterChange).catch(failed);
         }
         if (button.dataset.action === "toggle") {
             adminFetch(url, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: button.dataset.status })
-            }).then(loadMessages);
+            }).then(afterChange).catch(failed);
         }
     });
 }
 
-function showStats(results) {
-    if (!statsContainer) return;
-    const total = results.length;
-    const average = total ? (results.reduce((sum, r) => sum + Number(r.score || 0), 0) / total).toFixed(1) + "/10" : "—";
-    const count = level => results.filter(r => r.riskLevel === level).length;
+// ----- Assessment history -----
 
-    const card = (value, label, extraClass = "") => `
-        <div class="col-6 col-md-4 col-lg">
-            <div class="card stat-card h-100"><div class="card-body">
-                <span class="stat-number ${extraClass}">${value}</span>
-                <span class="stat-label">${label}</span>
-            </div></div>
-        </div>`;
-
-    statsContainer.innerHTML =
-        card(total, "Assessments taken") +
-        card(average, "Average score") +
-        card(count("Low"), "Low risk", "risk-low") +
-        card(count("Medium"), "Medium risk", "risk-medium") +
-        card(count("High"), "High risk", "risk-high");
-}
+const resultsContainer = document.getElementById("results-container");
 
 if (resultsContainer) {
-    adminFetch("/api/results").then(results => {
-        showStats(results);
-        if (results.length === 0) {
-            resultsContainer.innerHTML = "<p>No assessments taken yet.</p>";
-            return;
+    setupAdminList({
+        endpoint: "/api/results",
+        form: document.getElementById("results-filters"),
+        container: resultsContainer,
+        pager: document.getElementById("results-pager"),
+        exportLink: document.getElementById("results-export"),
+        emptyText: "No assessments taken yet.",
+        noMatchText: "No assessments match these filters.",
+        renderRows: results => {
+            let html = '<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr></thead><tbody>';
+            results.forEach(result => {
+                const level = escapeHTML(result.riskLevel);
+                html += `<tr><td>${escapeHTML(result.date)}</td><td><span class="badge rounded-pill badge-${level.toLowerCase()}">${level}</span></td><td>${escapeHTML(result.score)}/10</td></tr>`;
+            });
+            return html + "</tbody></table>";
         }
-        let html = '<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr></thead><tbody>';
-        results.forEach(result => {
-            const level = escapeHTML(result.riskLevel);
-            html += `<tr><td>${escapeHTML(result.date)}</td><td><span class="badge rounded-pill badge-${level.toLowerCase()}">${level}</span></td><td>${escapeHTML(result.score)}/10</td></tr>`;
-        });
-        html += "</tbody></table>";
-        resultsContainer.innerHTML = html;
-    }).catch(error => {
-        if (error.message !== "Not logged in") resultsContainer.innerHTML = "<p>Could not load results.</p>";
     });
 }
 
