@@ -4,15 +4,125 @@
 
 console.log("NetGuard script loaded.");
 
+// ===== THEME (applied right away so the page doesn't flash) =====
+
+const THEME_KEY = "netguard_theme";
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute("data-bs-theme", theme);
+}
+
+(function loadSavedTheme() {
+    let saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) { /* storage blocked */ }
+    applyTheme(saved === "dark" ? "dark" : "light");
+})();
+
+// ===== TOAST NOTIFICATIONS =====
+// Uses Bootstrap's Toast when Bootstrap is loaded on the page.
+// Pages without Bootstrap simply skip the toast (inline messages still work).
+
+function showToast(message, type = "success") {
+    if (!window.bootstrap || !window.bootstrap.Toast) return;
+
+    let container = document.getElementById("toast-container");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.className = "toast-container position-fixed bottom-0 end-0 p-3";
+        document.body.appendChild(container);
+    }
+
+    const toastEl = document.createElement("div");
+    toastEl.className = `toast align-items-center text-bg-${type} border-0`;
+    toastEl.setAttribute("role", type === "danger" ? "alert" : "status");
+    toastEl.setAttribute("aria-live", type === "danger" ? "assertive" : "polite");
+    toastEl.setAttribute("aria-atomic", "true");
+
+    const row = document.createElement("div");
+    row.className = "d-flex";
+
+    const body = document.createElement("div");
+    body.className = "toast-body";
+    body.textContent = message;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "btn-close btn-close-white me-2 m-auto";
+    closeBtn.setAttribute("data-bs-dismiss", "toast");
+    closeBtn.setAttribute("aria-label", "Close");
+
+    row.appendChild(body);
+    row.appendChild(closeBtn);
+    toastEl.appendChild(row);
+    container.appendChild(toastEl);
+
+    toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+    new window.bootstrap.Toast(toastEl, { delay: 4000 }).show();
+}
+
 // ===== ASSESSMENT FORM =====
 
 const assessmentForm = document.getElementById("assessment-form");
+const TOTAL_QUESTIONS = 10;
+let lastResult = null;
+
+// How many of the 10 questions have an answer right now
+function countAnswered() {
+    let answered = 0;
+    for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+        if (document.querySelector(`input[name="q${i}"]:checked`)) answered++;
+    }
+    return answered;
+}
+
+// Live progress bar, counter, answered/unanswered cards and the submit button
+function updateProgress() {
+    if (!assessmentForm) return;
+
+    const answered = countAnswered();
+    const remaining = TOTAL_QUESTIONS - answered;
+    const percent = Math.round((answered / TOTAL_QUESTIONS) * 100);
+
+    const progress = document.getElementById("progress");
+    const bar = document.getElementById("progress-bar");
+    const text = document.getElementById("progress-text");
+    const percentText = document.getElementById("progress-percent");
+    const submitBtn = document.getElementById("submit-btn");
+
+    if (bar) bar.style.width = percent + "%";
+    if (progress) {
+        progress.setAttribute("aria-valuenow", String(percent));
+        progress.classList.toggle("is-complete", remaining === 0);
+    }
+    if (text) text.textContent = `${answered} of ${TOTAL_QUESTIONS} answered`;
+    if (percentText) percentText.textContent = percent + "%";
+
+    if (submitBtn) {
+        submitBtn.disabled = remaining > 0;
+        submitBtn.textContent = remaining > 0
+            ? `Answer ${remaining} more question${remaining === 1 ? "" : "s"}`
+            : "Calculate My Risk Score";
+    }
+
+    // Mark each question card as answered / not answered yet
+    assessmentForm.querySelectorAll(".question").forEach((card) => {
+        const firstRadio = card.querySelector('input[type="radio"]');
+        if (!firstRadio) return;
+        const isAnswered = !!assessmentForm.querySelector(`input[name="${firstRadio.name}"]:checked`);
+        card.classList.toggle("answered", isAnswered);
+        if (isAnswered) card.classList.remove("is-missing");
+    });
+}
 
 if (assessmentForm) {
+    // Update the progress every time an answer changes
+    assessmentForm.addEventListener("change", updateProgress);
+
     assessmentForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const totalQuestions = 10;
         let answered = 0;
         let missing = [];
         let safeAnswers = 0;
@@ -20,7 +130,7 @@ if (assessmentForm) {
         const safeYesQuestions = [1, 4, 5, 6, 7, 8, 9, 10];
         const safeNoQuestions = [2, 3];
 
-        for (let i = 1; i <= totalQuestions; i++) {
+        for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
             const selected = document.querySelector(`input[name="q${i}"]:checked`);
             if (!selected) {
                 missing.push(i);
@@ -29,8 +139,16 @@ if (assessmentForm) {
             }
         }
 
-        if (answered < totalQuestions) {
-            alert("Please answer all questions before submitting.");
+        if (answered < TOTAL_QUESTIONS) {
+            // Highlight the cards that still need an answer and jump to the first one
+            missing.forEach((n) => {
+                const input = assessmentForm.querySelector(`input[name="q${n}"]`);
+                const card = input ? input.closest(".question") : null;
+                if (card) card.classList.add("is-missing");
+            });
+            const firstMissing = assessmentForm.querySelector(".question.is-missing");
+            if (firstMissing) firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+            showToast("Please answer all questions before submitting.", "danger");
             console.log("Missing questions:", missing);
             return;
         }
@@ -69,10 +187,22 @@ if (assessmentForm) {
         if (!isSafe(9, "yes")) checklist.push("Place your router in a secure location.");
         if (!isSafe(10, "yes")) checklist.push("Enable a firewall on your network.");
 
+        // Remember this result for the Download / Print buttons
+        lastResult = { riskLevel, score: safeAnswers, checklist, date: new Date().toISOString() };
+
         // Show results
         showResults(riskLevel, checklist, safeAnswers);
 
-        // --- NEW: Send results to backend ---
+        // Save to this browser's history (no personal answers, only level + score)
+        try {
+            NetGuardStorage.saveAssessment({ riskLevel: riskLevel, score: safeAnswers });
+            renderHistory();
+            showToast("Result saved to your history on this device.", "success");
+        } catch (error) {
+            console.error("Could not save history:", error);
+        }
+
+        // --- Send results to backend ---
         const resultData = {
             riskLevel: riskLevel,
             score: safeAnswers
@@ -129,6 +259,18 @@ function showResults(riskLevel, checklist, safeAnswers) {
         riskSummary.textContent = `You scored ${safeAnswers}/10. Your network may be vulnerable.`;
     }
 
+    // Animated score meter (colored by risk level)
+    const scoreMeter = document.getElementById("score-meter");
+    const scoreBar = document.getElementById("score-bar");
+    if (scoreMeter && scoreBar) {
+        scoreMeter.className = `progress score-meter score-${riskLevel.toLowerCase()}`;
+        scoreMeter.setAttribute("aria-label", `Score ${safeAnswers} out of 10`);
+        scoreBar.style.width = "0%";
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            scoreBar.style.width = `${safeAnswers * 10}%`;
+        }));
+    }
+
     // Build checklist
     checklistEl.innerHTML = "";
     if (checklist.length === 0) {
@@ -148,27 +290,133 @@ function showResults(riskLevel, checklist, safeAnswers) {
 // ===== CONTACT FORM =====
 
 const contactForm = document.getElementById("contact-form");
+const MESSAGE_MAX_LENGTH = 500;
+let contactSending = false;
+
+// One rule per required field: returns an error message, or "" when the value is fine
+const CONTACT_RULES = {
+    "contact-name": (value) =>
+        value.length >= 2 ? "" : "Please enter your name (at least 2 characters).",
+    "contact-email": (value) => {
+        if (!value) return "Please enter your email address.";
+        return NetGuardValidator.validateEmail(value) ? "" : "Please enter a valid email, like name@example.com.";
+    },
+    "contact-text": (value) =>
+        value.length >= 10 ? "" : "Please write at least 10 characters so we can help you."
+};
+
+// Checks one field. Only touches the screen (red/green border + message) when showError is true.
+function validateContactField(input, showError) {
+    const rule = CONTACT_RULES[input.id];
+    if (!rule) return true;
+
+    const message = rule(input.value.trim());
+    if (showError) {
+        input.classList.toggle("is-invalid", message !== "");
+        input.classList.toggle("is-valid", message === "");
+        input.setAttribute("aria-invalid", message !== "" ? "true" : "false");
+        const errorEl = document.getElementById(`${input.id}-error`);
+        if (errorEl) errorEl.textContent = message;
+    }
+    return message === "";
+}
+
+// The Send button is only enabled when every required field is valid
+function updateContactState() {
+    if (!contactForm) return;
+    const submitBtn = document.getElementById("contact-submit");
+    const allValid = Object.keys(CONTACT_RULES).every((id) => {
+        const input = document.getElementById(id);
+        return !input || validateContactField(input, false);
+    });
+    if (submitBtn) submitBtn.disabled = !allValid || contactSending;
+}
+
+// Live "123 / 500" counter under the message box
+function updateCharCount() {
+    const textarea = document.getElementById("contact-text");
+    const counter = document.getElementById("char-count");
+    if (!textarea || !counter) return;
+    const length = textarea.value.length;
+    counter.textContent = `${length} / ${MESSAGE_MAX_LENGTH}`;
+    counter.classList.toggle("near-limit", length >= MESSAGE_MAX_LENGTH * 0.9);
+}
+
+function resetContactForm() {
+    contactForm.reset();
+    contactForm.querySelectorAll("input, textarea").forEach((field) => {
+        field.classList.remove("is-invalid", "is-valid");
+        field.removeAttribute("aria-invalid");
+        delete field.dataset.touched;
+    });
+    contactForm.querySelectorAll(".field-error").forEach((el) => { el.textContent = ""; });
+    updateCharCount();
+}
 
 if (contactForm) {
+    // Live validation: show errors after the person leaves a field, then keep them updated while typing
+    Object.keys(CONTACT_RULES).forEach((id) => {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        input.addEventListener("blur", () => {
+            input.dataset.touched = "true";
+            validateContactField(input, true);
+            updateContactState();
+        });
+
+        input.addEventListener("input", () => {
+            if (input.dataset.touched === "true") validateContactField(input, true);
+            updateContactState();
+        });
+    });
+
+    const messageBox = document.getElementById("contact-text");
+    if (messageBox) messageBox.addEventListener("input", updateCharCount);
+
+    // Typing again hides the old success / error message
+    contactForm.addEventListener("input", () => {
+        const successEl = document.getElementById("contact-message");
+        const errorEl = document.getElementById("contact-error");
+        if (successEl) successEl.style.display = "none";
+        if (errorEl) errorEl.style.display = "none";
+    });
+
     contactForm.addEventListener("submit", function (event) {
         event.preventDefault();
+        if (contactSending) return;
 
-        // 1. Collect the data
-        const textInputs = contactForm.querySelectorAll('input[type="text"]');
-        const name = textInputs[0] ? textInputs[0].value.trim() : "";
-        const subject = textInputs[1] ? textInputs[1].value.trim() : "";
-        const email = contactForm.querySelector('input[type="email"]').value.trim();
-        const message = contactForm.querySelector("textarea").value.trim();
-
-        if (!name || !email || !message) {
-            alert("Please fill in all fields before sending.");
+        // 1. Show every error at once and jump to the first one
+        let firstInvalid = null;
+        Object.keys(CONTACT_RULES).forEach((id) => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.dataset.touched = "true";
+            if (!validateContactField(input, true) && !firstInvalid) firstInvalid = input;
+        });
+        if (firstInvalid) {
+            firstInvalid.focus();
             return;
         }
 
         // 2. Package the data
-        const contactData = { name, email, subject, message };
-        const submitBtn = contactForm.querySelector("button");
-        if (submitBtn) submitBtn.disabled = true;
+        const contactData = {
+            name: document.getElementById("contact-name").value.trim(),
+            email: document.getElementById("contact-email").value.trim(),
+            subject: document.getElementById("contact-subject").value.trim(),
+            message: document.getElementById("contact-text").value.trim()
+        };
+
+        const submitBtn = document.getElementById("contact-submit");
+        const errorEl = document.getElementById("contact-error");
+        const successEl = document.getElementById("contact-message");
+        if (errorEl) errorEl.style.display = "none";
+
+        contactSending = true;
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Sending...";
+        }
 
         // 3. Send to backend
         fetch("/contact", {
@@ -182,17 +430,23 @@ if (contactForm) {
         })
         .then(data => {
             // 4. Show success message
-            const msg = document.getElementById("contact-message");
-            if (msg) msg.style.display = "block";
-            contactForm.reset();
+            if (successEl) successEl.style.display = "block";
+            resetContactForm();
+            showToast("Message sent! We'll get back to you within 24 hours.", "success");
             console.log("Server:", data.message);
         })
         .catch(error => {
             console.error("Contact form error:", error);
-            alert("Sorry, your message couldn't be sent. Please try again later.");
+            if (errorEl) {
+                errorEl.textContent = "Sorry, your message couldn't be sent. Please try again later.";
+                errorEl.style.display = "block";
+            }
+            showToast("Your message couldn't be sent. Please try again later.", "danger");
         })
         .finally(() => {
-            if (submitBtn) submitBtn.disabled = false;
+            contactSending = false;
+            if (submitBtn) submitBtn.textContent = "Send Message";
+            updateContactState();
         });
     });
 }
@@ -368,3 +622,205 @@ const NetGuardStorage = {
         return (total / history.length).toFixed(1);
     }
 };
+
+// ==========================================
+// REACTIVE UI: history, download/print/retake, header controls
+// ==========================================
+
+// ----- Assessment history (stored in this browser with NetGuardStorage) -----
+
+function renderHistory() {
+    const section = document.getElementById("history-section");
+    const body = document.getElementById("history-body");
+    if (!section || !body) return;
+
+    const history = NetGuardStorage.getHistory();
+    section.style.display = history.length ? "" : "none";
+    body.innerHTML = "";
+
+    history.forEach((item) => {
+        const level = String(item.riskLevel || "").toLowerCase();
+        const row = document.createElement("tr");
+
+        const dateCell = document.createElement("td");
+        dateCell.textContent = new Date(item.date).toLocaleString();
+
+        const levelCell = document.createElement("td");
+        levelCell.textContent = item.riskLevel;
+        if (["low", "medium", "high"].includes(level)) levelCell.className = `risk-${level}`;
+
+        const scoreCell = document.createElement("td");
+        scoreCell.textContent = `${item.score}/10`;
+
+        row.appendChild(dateCell);
+        row.appendChild(levelCell);
+        row.appendChild(scoreCell);
+        body.appendChild(row);
+    });
+
+    const summary = document.getElementById("history-average");
+    if (summary && history.length) {
+        summary.textContent =
+            `Average score: ${NetGuardStorage.calculateAverageRiskScore()}/10 across your last ${history.length} assessment${history.length === 1 ? "" : "s"}.`;
+    }
+}
+
+function clearHistory() {
+    if (!confirm("Clear your saved assessment history on this device?")) return;
+    try { localStorage.removeItem(NetGuardStorage.STORAGE_KEY); } catch (e) { /* storage blocked */ }
+    renderHistory();
+    showToast("History cleared.", "dark");
+}
+
+// ----- Result buttons: download, print, retake -----
+
+function downloadChecklist() {
+    if (!lastResult) return;
+
+    const lines = [
+        "NetGuard - Wi-Fi Security Checklist",
+        `Date: ${new Date(lastResult.date).toLocaleString()}`,
+        `Risk level: ${lastResult.riskLevel}`,
+        `Score: ${lastResult.score}/10`,
+        ""
+    ];
+
+    if (lastResult.checklist.length === 0) {
+        lines.push("Nothing to fix - your setup looks great!");
+    } else {
+        lines.push("Recommended fixes:");
+        lastResult.checklist.forEach((item, index) => lines.push(`${index + 1}. ${item}`));
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `netguard-checklist-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+
+    showToast("Checklist downloaded.", "success");
+}
+
+function resetAssessment() {
+    assessmentForm.reset();
+    updateProgress();
+    lastResult = null;
+
+    document.getElementById("result-box").style.display = "none";
+    document.getElementById("results-placeholder").style.display = "";
+
+    const section = document.getElementById("assessment-section");
+    if (section) section.scrollIntoView({ behavior: "smooth" });
+}
+
+// ----- Header: dark mode toggle + mobile menu button (added on every page) -----
+
+const ICON_ATTRS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+const ICON_MOON = `<svg ${ICON_ATTRS}><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>`;
+const ICON_SUN = `<svg ${ICON_ATTRS}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>`;
+const ICON_MENU = `<svg ${ICON_ATTRS}><path d="M4 6h16M4 12h16M4 18h16"/></svg>`;
+const ICON_CLOSE = `<svg ${ICON_ATTRS}><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+
+function initHeaderControls() {
+    const header = document.querySelector(".site-header");
+    if (!header) return;
+
+    // --- Dark mode toggle ---
+    const themeBtn = document.createElement("button");
+    themeBtn.type = "button";
+    themeBtn.className = "icon-btn theme-toggle";
+
+    function refreshThemeButton() {
+        const dark = document.documentElement.getAttribute("data-theme") === "dark";
+        const label = dark ? "Switch to light mode" : "Switch to dark mode";
+        themeBtn.innerHTML = dark ? ICON_SUN : ICON_MOON;
+        themeBtn.setAttribute("aria-label", label);
+        themeBtn.title = label;
+    }
+
+    themeBtn.addEventListener("click", () => {
+        const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        applyTheme(next);
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* storage blocked */ }
+        refreshThemeButton();
+    });
+
+    refreshThemeButton();
+    header.appendChild(themeBtn);
+
+    // --- Mobile menu (hamburger) ---
+    const nav = header.querySelector("nav");
+    if (!nav) return;
+    if (!nav.id) nav.id = "site-nav";
+
+    const menuBtn = document.createElement("button");
+    menuBtn.type = "button";
+    menuBtn.className = "icon-btn nav-toggle";
+    menuBtn.setAttribute("aria-controls", nav.id);
+    menuBtn.setAttribute("aria-expanded", "false");
+    menuBtn.setAttribute("aria-label", "Open menu");
+    menuBtn.innerHTML = ICON_MENU;
+
+    function setMenu(open) {
+        header.classList.toggle("nav-open", open);
+        menuBtn.setAttribute("aria-expanded", String(open));
+        menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        menuBtn.innerHTML = open ? ICON_CLOSE : ICON_MENU;
+    }
+
+    menuBtn.addEventListener("click", () => setMenu(!header.classList.contains("nav-open")));
+    nav.addEventListener("click", (event) => { if (event.target.closest("a")) setMenu(false); });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && header.classList.contains("nav-open")) setMenu(false);
+    });
+
+    // Close the menu if the window grows back to desktop size
+    const desktopQuery = window.matchMedia("(min-width: 761px)");
+    if (desktopQuery.addEventListener) {
+        desktopQuery.addEventListener("change", (event) => { if (event.matches) setMenu(false); });
+    }
+
+    header.appendChild(menuBtn);
+    header.classList.add("has-nav-toggle");
+}
+
+// ----- Start everything -----
+
+(function initUI() {
+    initHeaderControls();
+
+    // Always print in light mode, then go back to the chosen theme
+    let themeBeforePrint = null;
+    window.addEventListener("beforeprint", () => {
+        themeBeforePrint = document.documentElement.getAttribute("data-theme");
+        applyTheme("light");
+    });
+    window.addEventListener("afterprint", () => {
+        if (themeBeforePrint) applyTheme(themeBeforePrint);
+        themeBeforePrint = null;
+    });
+
+    if (assessmentForm) {
+        updateProgress();
+        renderHistory();
+
+        const downloadBtn = document.getElementById("download-btn");
+        const printBtn = document.getElementById("print-btn");
+        const retakeBtn = document.getElementById("retake-btn");
+        const clearBtn = document.getElementById("clear-history");
+
+        if (downloadBtn) downloadBtn.addEventListener("click", downloadChecklist);
+        if (printBtn) printBtn.addEventListener("click", () => window.print());
+        if (retakeBtn) retakeBtn.addEventListener("click", resetAssessment);
+        if (clearBtn) clearBtn.addEventListener("click", clearHistory);
+    }
+
+    if (contactForm) {
+        updateCharCount();
+        updateContactState();
+    }
+})();
