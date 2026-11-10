@@ -43,128 +43,14 @@
         <section>
             <form id="assessment-form" class="assessment-form">
 
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">1</span> Do you use a strong password for your Wi-Fi network?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q1" id="q1-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q1-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q1" id="q1-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q1-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
+                <div id="questions-container" class="question-list" aria-live="polite">
+                    <p class="text-body-secondary">Loading questions...</p>
+                </div>
 
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">2</span> Is your Wi-Fi password shared with many people?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q2" id="q2-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q2-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q2" id="q2-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q2-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">3</span> Is your router's admin password still the default one?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q3" id="q3-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q3-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q3" id="q3-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q3-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">4</span> Do you keep your router's firmware updated?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q4" id="q4-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q4-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q4" id="q4-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q4-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">5</span> Do you use WPA2 or WPA3 encryption?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q5" id="q5-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q5-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q5" id="q5-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q5-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">6</span> Is your Wi-Fi network hidden from public view?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q6" id="q6-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q6-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q6" id="q6-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q6-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">7</span> Do you have a guest network for visitors?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q7" id="q7-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q7-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q7" id="q7-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q7-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">8</span> Do you regularly check who is connected to your network?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q8" id="q8-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q8-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q8" id="q8-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q8-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">9</span> Is your router placed in a secure location?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q9" id="q9-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q9-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q9" id="q9-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q9-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset class="card question">
-                    <div class="card-body">
-                        <legend class="question-text"><span class="question-number">10</span> Do you use a firewall on your network?</legend>
-                        <div class="options">
-                            <input type="radio" class="btn-check" name="q10" id="q10-yes" value="yes" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q10-yes">Yes</label>
-                            <input type="radio" class="btn-check" name="q10" id="q10-no" value="no" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="q10-no">No</label>
-                        </div>
-                    </div>
-                </fieldset>
+                <div id="assessment-error" class="alert alert-danger mb-0" role="alert" style="display: none;"></div>
 
                 <div>
-                    <button type="submit" class="btn btn-primary btn-lg">Calculate My Risk Score</button>
+                    <button type="submit" class="btn btn-primary btn-lg" disabled>Calculate My Risk Score</button>
                 </div>
 
             </form>

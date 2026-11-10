@@ -7,3 +7,8 @@ Thumbs.db
 
 # Node modules (for later)
 node_modules/
+# Local settings and passwords (copy .env.example to .env)
+.env
+# Admin accounts (password hashes) - never commit
+admins.json
+admins.json.tmp

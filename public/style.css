@@ -351,6 +351,17 @@ section h2 {
     font-weight: 500;
 }
 
+.question-list {
+    display: grid;
+    gap: 12px;
+}
+
+/* A question the user skipped, after they press Calculate */
+.question.is-unanswered {
+    border-color: var(--high);
+    box-shadow: 0 0 0 3px var(--high-soft);
+}
+
 /* ===== Assessment: results ===== */
 .result-box h3 {
     font-size: 24px;
@@ -402,6 +413,167 @@ section h2 {
 .stat-label {
     font-size: 13px;
     color: var(--muted);
+}
+
+/* ===== Admin: charts ===== */
+.chart-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.chart-caption {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 2px 0 16px 0;
+}
+
+/* Column chart: y-axis labels on the left, bars + day labels on the right */
+.trend-plot {
+    display: flex;
+    gap: 8px;
+}
+
+.trend-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 160px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    min-width: 16px;
+    line-height: 1;
+}
+
+.trend-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.trend-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px; /* surface gap between neighbouring bars */
+    height: 160px;
+    border-bottom: 1px solid var(--line);
+    /* faint top gridline at the axis maximum */
+    background: linear-gradient(var(--line), var(--line)) top / 100% 1px no-repeat;
+}
+
+.trend-col {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: default;
+    outline: none;
+}
+
+.trend-col:hover,
+.trend-col:focus-visible {
+    background-color: var(--accent-soft);
+}
+
+.trend-bar {
+    width: 100%;
+    max-width: 24px;
+    background-color: var(--accent);
+    border-radius: 4px 4px 0 0;
+}
+
+.trend-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+}
+
+.trend-labels {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.trend-labels span {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Horizontal bars: question text above a bar with its % at the end */
+.hbar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.hbar-row {
+    border-radius: 6px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    outline: none;
+}
+
+.hbar-row:hover,
+.hbar-row:focus-visible {
+    background-color: var(--accent-soft);
+}
+
+.hbar-label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.hbar-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hbar-fill {
+    display: block;
+    height: 10px;
+    min-width: 2px;
+    max-width: calc(100% - 44px);
+    background-color: var(--accent);
+    border-radius: 0 4px 4px 0;
+}
+
+.hbar-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.chart-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 1080;
+    max-width: 260px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: var(--ink);
+    color: #ffffff;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+@media (max-width: 575.98px) {
+    /* Too narrow for 14 day labels: show every other one */
+    .trend-labels .trend-label-odd {
+        visibility: hidden;
+    }
 }
 
 /* ===== Admin: section header, filters, pager ===== */

@@ -27,6 +27,7 @@
                         <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
                         <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
                         <li class="nav-item"><a class="nav-link active" aria-current="page" href="/admin">Admin</a></li>
+                        <li class="nav-item ms-md-3 small text-body-secondary" id="signed-in-as"></li>
                         <li class="nav-item ms-md-2 my-2 my-md-0">
                             <button id="logout-button" type="button" class="btn btn-sm btn-outline-secondary">Log out</button>
                         </li>
@@ -46,6 +47,23 @@
         <section>
             <h2>Overview</h2>
             <div id="stats-container" class="row g-3">Loading stats...</div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-lg-6">
+                    <div class="card h-100"><div class="card-body">
+                        <h3 class="chart-title">Assessments per day</h3>
+                        <p id="trend-caption" class="chart-caption">Last 14 days</p>
+                        <div id="trend-chart" class="trend-chart">Loading...</div>
+                    </div></div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card h-100"><div class="card-body">
+                        <h3 class="chart-title">Most often answered unsafely</h3>
+                        <p class="chart-caption">Share of people who got each question wrong</p>
+                        <div id="failed-chart">Loading...</div>
+                    </div></div>
+                </div>
+            </div>
         </section>
 
         <section>
@@ -71,7 +89,7 @@
             <div id="messages-pager"></div>
         </section>
 
-        <section class="border-0">
+        <section>
             <div class="section-head">
                 <h2>Assessment History</h2>
                 <a id="results-export" class="btn btn-sm btn-outline-secondary" href="/api/results/export" download>Export CSV</a>
@@ -97,6 +115,94 @@
             </form>
             <div id="results-container" class="table-responsive">Loading results...</div>
             <div id="results-pager"></div>
+        </section>
+
+        <section>
+            <div class="section-head">
+                <h2>Assessment Questions</h2>
+                <button type="button" id="question-add" class="btn btn-sm btn-primary">Add question</button>
+            </div>
+            <p class="text-body-secondary small">
+                Changes apply to the next assessment someone takes. Saved results keep the questions they were scored with.
+            </p>
+
+            <form id="question-form" class="card mb-3" style="display: none;" novalidate>
+                <div class="card-body">
+                    <h3 id="question-form-title" class="h6">Add question</h3>
+                    <div class="mb-3">
+                        <label for="question-text" class="form-label">Question</label>
+                        <input type="text" id="question-text" class="form-control" maxlength="200" placeholder="e.g. Do you use a VPN on public Wi-Fi?">
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-4">
+                            <label for="question-safe" class="form-label">Safe answer</label>
+                            <select id="question-safe" class="form-select">
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-8">
+                            <label for="question-fix" class="form-label">Fix shown when answered unsafely</label>
+                            <input type="text" id="question-fix" class="form-control" maxlength="200" placeholder="e.g. Use a VPN when you connect to public Wi-Fi.">
+                        </div>
+                    </div>
+                    <div id="question-error" class="alert alert-danger" role="alert" style="display: none;"></div>
+                    <button type="submit" class="btn btn-sm btn-primary">Save question</button>
+                    <button type="button" id="question-cancel" class="btn btn-sm btn-outline-secondary">Cancel</button>
+                </div>
+            </form>
+
+            <div id="questions-admin" class="table-responsive">Loading questions...</div>
+        </section>
+
+        <section class="border-0" id="accounts">
+            <h2>Admin Accounts</h2>
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div id="admins-container" class="table-responsive mb-3">Loading accounts...</div>
+
+                    <form id="add-admin-form" class="card" novalidate>
+                        <div class="card-body">
+                            <h3 class="h6">Add an admin</h3>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label for="new-admin-username" class="form-label">Username</label>
+                                    <input type="text" id="new-admin-username" class="form-control form-control-sm" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. jake">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="new-admin-password" class="form-label">Password</label>
+                                    <input type="password" id="new-admin-password" class="form-control form-control-sm" maxlength="128" autocomplete="new-password" placeholder="Temporary password">
+                                </div>
+                            </div>
+                            <p class="form-text mb-3">This is a temporary password (it can be <code>netguard-admin</code>). Give it to them privately: they'll have to choose their own password the first time they log in.</p>
+                            <div id="add-admin-error" class="alert alert-danger py-2" role="alert" style="display: none;"></div>
+                            <button type="submit" class="btn btn-sm btn-primary">Add admin</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-lg-5">
+                    <form id="change-password-form" class="card" novalidate>
+                        <div class="card-body">
+                            <h3 class="h6">Change my password</h3>
+                            <div class="mb-2">
+                                <label for="current-password" class="form-label">Current password</label>
+                                <input type="password" id="current-password" class="form-control form-control-sm" maxlength="128" autocomplete="current-password">
+                            </div>
+                            <div class="mb-2">
+                                <label for="new-password" class="form-label">New password</label>
+                                <input type="password" id="new-password" class="form-control form-control-sm" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters">
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm-password" class="form-label">Type the new password again</label>
+                                <input type="password" id="confirm-password" class="form-control form-control-sm" maxlength="128" autocomplete="new-password">
+                            </div>
+                            <div id="change-password-message" class="alert py-2" role="status" style="display: none;"></div>
+                            <button type="submit" class="btn btn-sm btn-primary">Change password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
 
     </main>
