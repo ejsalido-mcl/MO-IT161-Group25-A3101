@@ -315,9 +315,9 @@ Results are only reachable by their random ID link or by admins.
 | Member |
 |--------|
 | Roi Jewel Carbonell |
-| Evan |
-| Lenard |
-| Hady |
+| Evan Jake Salido |
+| Lenard Usita|
+| Hady Bassyouny |
 
 ---
 
