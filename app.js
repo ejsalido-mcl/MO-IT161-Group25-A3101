@@ -3,18 +3,48 @@ const session = require("express-session");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const { validateContact, validateResult } = require("./validators");
+const { createRateLimiter } = require("./ratelimit");
 
 const app = express();
 
 // --- SETTINGS ---
-const PORT = 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "netguard-admin";
-const MESSAGES_FILE = path.join(__dirname, "messages.json");
-const RESULTS_FILE = path.join(__dirname, "results.json");
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PORT = process.env.PORT || 3000;
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const DEFAULT_ADMIN_PASSWORD = "netguard-admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+const DATA_DIR = process.env.DATA_DIR || __dirname; // tests point this to a temp folder
+const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+const RESULTS_FILE = path.join(DATA_DIR, "results.json");
+
+// The default password is public (it is in the GitHub repo), so never run with it for real
+if (ADMIN_PASSWORD === DEFAULT_ADMIN_PASSWORD) {
+    if (IS_PRODUCTION) {
+        console.error("Refusing to start: set the ADMIN_PASSWORD environment variable.");
+        process.exit(1);
+    }
+    console.warn("WARNING: using the default admin password. Set ADMIN_PASSWORD before deploying.");
+}
+
+// Rate limits (the numbers can be changed with environment variables, e.g. for tests)
+const loginLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: Number(process.env.LOGIN_MAX) || 10 });
+const contactLimiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: Number(process.env.CONTACT_MAX) || 5 });
+const resultLimiter = createRateLimiter({ windowMs: 10 * 60 * 1000, max: Number(process.env.RESULT_MAX) || 30 });
 
 // --- MIDDLEWARE ---
-app.use(express.json());
+app.disable("x-powered-by");
+
+// Basic security headers
+app.use((req, res, next) => {
+    res.set({
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+    });
+    next();
+});
+
+app.use(express.json({ limit: "10kb" }));
 
 // Sessions remember who is logged in as admin
 app.use(session({
@@ -54,8 +84,18 @@ function readData(file) {
     return data;
 }
 
+// Write to a temporary file first, then swap it in, so a crash can't leave half a file
 function writeData(file, data) {
-    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+    const temp = file + ".tmp";
+    fs.writeFileSync(temp, JSON.stringify(data, null, 2));
+    fs.renameSync(temp, file);
+}
+
+// Compare passwords without leaking timing information
+function passwordMatches(input) {
+    const a = crypto.createHash("sha256").update(String(input)).digest();
+    const b = crypto.createHash("sha256").update(ADMIN_PASSWORD).digest();
+    return crypto.timingSafeEqual(a, b);
 }
 
 // Only let logged-in admins through
@@ -81,10 +121,10 @@ app.get("/admin", requireAdmin, (req, res) => {
 });
 
 // --- AUTHENTICATION ---
-app.post("/login", (req, res) => {
-    const password = String(req.body.password || "");
-    if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: "Wrong password." });
-    
+app.post("/login", loginLimiter, (req, res) => {
+    const password = String((req.body && req.body.password) || "");
+    if (!passwordMatches(password)) return res.status(401).json({ error: "Wrong password." });
+
     req.session.regenerate(err => {
         if (err) return res.status(500).json({ error: "Login failed." });
         req.session.isAdmin = true;
@@ -97,25 +137,19 @@ app.post("/logout", (req, res) => {
 });
 
 // --- BACKEND FEATURE 1: Contact Messages (CRUD) ---
-app.post("/contact", (req, res) => {
-    const { name, email, subject, message } = req.body;
-
-    if (!name || !name.trim() || !email || !email.trim() || !message || !message.trim()) {
-        return res.status(400).json({ error: "Missing required fields." });
-    }
-    if (!EMAIL_PATTERN.test(email.trim())) {
-        return res.status(400).json({ error: "Invalid email address." });
+app.post("/contact", contactLimiter, (req, res) => {
+    const result = validateContact(req.body);
+    if (!result.ok) {
+        return res.status(400).json({ error: "Please check the form.", details: result.errors });
     }
 
     const messages = readData(MESSAGES_FILE);
     messages.push({
         id: crypto.randomUUID(),
-        name: name.trim(),
-        email: email.trim(),
-        subject: subject ? subject.trim() : "",
-        message: message.trim(),
+        ...result.value, // name, email, subject, message (already trimmed and checked)
         status: "new",
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        createdAt: new Date().toISOString()
     });
     writeData(MESSAGES_FILE, messages);
     res.json({ message: "Message saved successfully!" });
@@ -124,7 +158,7 @@ app.post("/contact", (req, res) => {
 app.get("/api/messages", requireAdmin, (req, res) => res.json(readData(MESSAGES_FILE)));
 
 app.patch("/api/messages/:id", requireAdmin, (req, res) => {
-    const { status } = req.body;
+    const status = req.body && req.body.status;
     if (!["new", "resolved"].includes(status)) return res.status(400).json({ error: "Invalid status." });
 
     const messages = readData(MESSAGES_FILE);
@@ -146,20 +180,19 @@ app.delete("/api/messages/:id", requireAdmin, (req, res) => {
 });
 
 // --- BACKEND FEATURE 2: Assessment Results ---
-app.post("/save-result", (req, res) => {
-    const { riskLevel, score } = req.body;
-    const validLevels = ["Low", "Medium", "High"];
-    
-    if (!validLevels.includes(riskLevel) || !Number.isInteger(score) || score < 0 || score > 10) {
-        return res.status(400).json({ error: "Invalid assessment result." });
+app.post("/save-result", resultLimiter, (req, res) => {
+    const result = validateResult(req.body);
+    if (!result.ok) {
+        return res.status(400).json({ error: "Invalid assessment result.", details: result.errors });
     }
 
     const results = readData(RESULTS_FILE);
     results.push({
         id: crypto.randomUUID(),
-        riskLevel,
-        score,
-        date: new Date().toLocaleString()
+        riskLevel: result.value.riskLevel,
+        score: result.value.score,
+        date: new Date().toLocaleString(),
+        createdAt: new Date().toISOString()
     });
     writeData(RESULTS_FILE, results);
     res.json({ message: "Assessment saved successfully!" });
@@ -167,4 +200,19 @@ app.post("/save-result", (req, res) => {
 
 app.get("/api/results", requireAdmin, (req, res) => res.json(readData(RESULTS_FILE)));
 
-app.listen(PORT, () => console.log(`NetGuard backend running on port ${PORT}`));
+// --- ERRORS (always answer with JSON, never a stack trace) ---
+app.use("/api", (req, res) => res.status(404).json({ error: "Not found." }));
+
+app.use((err, req, res, next) => {
+    if (err.type === "entity.parse.failed") return res.status(400).json({ error: "Invalid JSON." });
+    if (err.type === "entity.too.large") return res.status(413).json({ error: "Request too large." });
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong." });
+});
+
+// Start the server only when run directly (node app.js). Tests import the app instead.
+if (require.main === module) {
+    app.listen(PORT, () => console.log(`NetGuard backend running on port ${PORT}`));
+}
+
+module.exports = app;

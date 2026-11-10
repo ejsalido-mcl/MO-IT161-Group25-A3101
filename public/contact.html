@@ -36,15 +36,15 @@
             <div class="card">
                 <form id="contact-form" novalidate>
                     <label for="contact-name">Your Name:</label>
-                    <input type="text" id="contact-name" placeholder="Enter your name" autocomplete="name" aria-describedby="contact-name-error">
+                    <input type="text" id="contact-name" maxlength="100" placeholder="Enter your name" autocomplete="name" aria-describedby="contact-name-error">
                     <p class="field-error" id="contact-name-error"></p>
 
                     <label for="contact-email">Email Address:</label>
-                    <input type="email" id="contact-email" placeholder="Enter your email" autocomplete="email" aria-describedby="contact-email-error">
+                    <input type="email" id="contact-email" maxlength="254" placeholder="Enter your email" autocomplete="email" aria-describedby="contact-email-error">
                     <p class="field-error" id="contact-email-error"></p>
 
                     <label for="contact-subject">Subject:</label>
-                    <input type="text" id="contact-subject" placeholder="What is this about?">
+                    <input type="text" id="contact-subject" maxlength="200" placeholder="What is this about?">
 
                     <label for="contact-text">Message:</label>
                     <textarea id="contact-text" rows="5" maxlength="500" placeholder="Describe your concern or question." aria-describedby="contact-text-error char-count"></textarea>
