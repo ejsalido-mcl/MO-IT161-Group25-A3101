@@ -35,16 +35,16 @@
             <div class="card">
                 <form id="contact-form">
                     <label for="contact-name">Your Name:</label>
-                    <input type="text" id="contact-name" placeholder="Enter your name">
+                    <input type="text" id="contact-name" maxlength="100" placeholder="Enter your name">
 
                     <label for="contact-email">Email Address:</label>
-                    <input type="email" id="contact-email" placeholder="Enter your email">
+                    <input type="email" id="contact-email" maxlength="254" placeholder="Enter your email">
 
                     <label for="contact-subject">Subject:</label>
-                    <input type="text" id="contact-subject" placeholder="What is this about?">
+                    <input type="text" id="contact-subject" maxlength="150" placeholder="What is this about?">
 
                     <label for="contact-text">Message:</label>
-                    <textarea id="contact-text" rows="5" placeholder="Describe your concern or question."></textarea>
+                    <textarea id="contact-text" rows="5" maxlength="2000" placeholder="Describe your concern or question."></textarea>
 
                     <button>Send Message</button>
                 </form>

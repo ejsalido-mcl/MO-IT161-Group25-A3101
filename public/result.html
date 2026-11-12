@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NetGuard – Your Result</title>
+    <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="brand">
+            <img src="images/shield.svg" alt="" class="brand-icon">
+            <span>NetGuard</span>
+        </a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="assessment.html">Start Assessment</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="page-intro">
+            <p class="eyebrow">Saved result</p>
+            <h1>Your Wi-Fi Risk Result</h1>
+            <p class="lead">This is the result you saved from a previous NetGuard assessment.</p>
+        </section>
+
+        <section>
+            <p id="saved-status" class="placeholder" role="status">Loading your result...</p>
+
+            <div class="result-box" id="saved-result" style="display: none;">
+                <h3 id="saved-level">Risk Level: —</h3>
+                <p id="saved-summary">—</p>
+                <p id="saved-date" class="placeholder">—</p>
+
+                <h4>Recommended Fixes</h4>
+                <ul id="saved-checklist"></ul>
+
+                <p>Changed your setup since then? Take the assessment again to see your new score and checklist.</p>
+                <a href="assessment.html" class="button">Retake Assessment</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Contact: support@netguard.com</p>
+        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

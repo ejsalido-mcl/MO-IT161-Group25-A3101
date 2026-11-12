@@ -34,15 +34,34 @@
         <section>
             <h2>Overview</h2>
             <div id="stats-container" class="stats-grid">Loading stats...</div>
+
+            <div class="chart-grid">
+                <div class="card">
+                    <h3 class="chart-title">Assessments per day</h3>
+                    <p id="trend-caption" class="chart-caption">Last 14 days</p>
+                    <div id="trend-chart" class="trend-chart">Loading...</div>
+                </div>
+                <div class="card">
+                    <h3 class="chart-title">Most often answered unsafely</h3>
+                    <p class="chart-caption">Share of people who got each question wrong</p>
+                    <div id="failed-chart">Loading...</div>
+                </div>
+            </div>
         </section>
 
         <section>
-            <h2>Received Messages</h2>
+            <div class="section-head">
+                <h2>Received Messages</h2>
+                <a class="button button-secondary btn-small" href="/api/messages/export" download>Export CSV</a>
+            </div>
             <div id="messages-container" class="table-wrap">Loading messages...</div>
         </section>
 
         <section>
-            <h2>Assessment History</h2>
+            <div class="section-head">
+                <h2>Assessment History</h2>
+                <a class="button button-secondary btn-small" href="/api/results/export" download>Export CSV</a>
+            </div>
             <div id="results-container" class="table-wrap">Loading results...</div>
         </section>
 
