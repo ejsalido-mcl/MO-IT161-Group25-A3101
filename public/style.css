@@ -1,6 +1,11 @@
 /* ============================================
    NetGuard — Security Assessment Tool
-   Stylesheet
+   Stylesheet (theme layer on top of Bootstrap 5.3)
+
+   Bootstrap handles the layout (container / row / col),
+   navbar, buttons, forms, cards, tables and alerts.
+   This file only sets NetGuard's colors and the
+   few custom pieces Bootstrap doesn't have.
    ============================================ */
 
 /* ===== Colors (change them here, they update everywhere) ===== */
@@ -21,71 +26,64 @@
     --high: #b91c1c;
     --high-soft: #fef2f2;
     --radius: 10px;
-}
 
-/* ===== Base Styles & Typography ===== */
-* {
-    box-sizing: border-box;
+    /* Point Bootstrap's own variables at the NetGuard colors */
+    --bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --bs-body-color: var(--text);
+    --bs-body-bg: var(--bg);
+    --bs-emphasis-color: var(--ink);
+    --bs-secondary-color: var(--muted);
+    --bs-border-color: var(--line);
+    --bs-border-radius: 8px;
+    --bs-border-radius-lg: var(--radius);
+    --bs-primary: var(--accent);
+    --bs-primary-rgb: 37, 99, 235;
+    --bs-link-color: var(--accent);
+    --bs-link-color-rgb: 37, 99, 235;
+    --bs-link-hover-color: var(--accent-dark);
+    --bs-link-hover-color-rgb: 29, 78, 216;
+    --bs-heading-color: var(--ink);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
-    color: var(--text);
-    background-color: var(--bg);
-    margin: 0;
 }
 
-h1, h2, h3, h4 {
-    color: var(--ink);
+/* ===== Buttons: Bootstrap's blue -> NetGuard blue ===== */
+.btn-primary {
+    --bs-btn-bg: var(--accent);
+    --bs-btn-border-color: var(--accent);
+    --bs-btn-hover-bg: var(--accent-dark);
+    --bs-btn-hover-border-color: var(--accent-dark);
+    --bs-btn-active-bg: var(--accent-dark);
+    --bs-btn-active-border-color: var(--accent-dark);
+    --bs-btn-disabled-bg: var(--accent);
+    --bs-btn-disabled-border-color: var(--accent);
+    --bs-btn-focus-shadow-rgb: 37, 99, 235;
 }
 
-img {
-    max-width: 100%;
-    height: auto;
-    display: block;
+.btn-outline-primary {
+    --bs-btn-color: var(--accent-dark);
+    --bs-btn-border-color: #cbd5e1;
+    --bs-btn-hover-color: var(--accent-dark);
+    --bs-btn-hover-bg: var(--accent-soft);
+    --bs-btn-hover-border-color: var(--accent);
+    --bs-btn-active-color: var(--accent-dark);
+    --bs-btn-active-bg: var(--accent-soft);
+    --bs-btn-active-border-color: var(--accent);
+    --bs-btn-focus-shadow-rgb: 37, 99, 235;
 }
 
-/* ===== Layout: every top-level block shares one column ===== */
-body > * {
-    max-width: 1040px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 24px;
-    padding-right: 24px;
+.btn {
+    font-weight: 600;
 }
 
-/* ===== Header: logo + navigation in one row ===== */
-.site-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px 32px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    position: relative;
+.form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem var(--accent-soft);
 }
 
-/* Divider lines line up with the content edges */
-.site-header::after,
-footer::before {
-    content: "";
-    position: absolute;
-    left: 24px;
-    right: 24px;
-    height: 1px;
-    background-color: var(--line);
-}
-
-.site-header::after {
-    bottom: 0;
-}
-
-footer::before {
-    top: 0;
-}
-
+/* ===== Navbar ===== */
 .brand {
     display: flex;
     align-items: center;
@@ -93,7 +91,6 @@ footer::before {
     font-size: 20px;
     font-weight: 700;
     color: var(--ink);
-    text-decoration: none;
     letter-spacing: -0.3px;
 }
 
@@ -113,33 +110,29 @@ footer::before {
     vertical-align: middle;
 }
 
-/* ===== Navigation ===== */
-nav {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-nav a {
-    color: var(--muted);
-    text-decoration: none;
+.navbar .nav-link {
     font-size: 14px;
     font-weight: 500;
+    color: var(--muted);
     padding: 6px 12px;
     border-radius: 6px;
-    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-nav a:hover {
+.navbar-nav .nav-link:hover {
     color: var(--ink);
     background-color: #f1f5f9;
 }
 
-/* The page you are on */
-nav a[aria-current="page"] {
+.navbar-nav .nav-link.active {
     color: var(--accent-dark);
     background-color: var(--accent-soft);
+}
+
+@media (min-width: 768px) {
+    .navbar-nav .nav-link {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
 }
 
 /* ===== Sections ===== */
@@ -155,10 +148,6 @@ section h2 {
     margin: 0 0 24px 0;
 }
 
-section p {
-    margin: 0 0 16px 0;
-}
-
 /* Title area at the top of inner pages */
 .page-intro {
     padding: 48px 0 40px 0;
@@ -166,6 +155,7 @@ section p {
 
 .page-intro h1 {
     font-size: 36px;
+    font-weight: 700;
     line-height: 1.15;
     letter-spacing: -0.8px;
     margin: 0 0 12px 0;
@@ -188,93 +178,27 @@ section p {
 
 .lead {
     font-size: 17px;
-    color: var(--text);
+    font-weight: 400;
 }
 
-/* White box used for forms and panels */
+/* Cards share the same soft border everywhere */
 .card {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 24px;
-}
-
-/* ===== Buttons (work on <a class="button"> and <button>) ===== */
-.button,
-button {
-    display: inline-block;
-    background-color: var(--accent);
-    color: #ffffff;
-    padding: 12px 22px;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    font-family: inherit;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.button:hover,
-button:hover {
-    background-color: var(--accent-dark);
-    border-color: var(--accent-dark);
-}
-
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.button-secondary {
-    background-color: transparent;
-    color: var(--ink);
-    border-color: #cbd5e1;
-}
-
-.button-secondary:hover {
-    background-color: var(--surface);
-    border-color: var(--ink);
-}
-
-.btn-small {
-    padding: 6px 12px;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.btn-danger {
-    background-color: var(--high);
-    border-color: var(--high);
-}
-
-.btn-danger:hover {
-    background-color: #991b1b;
-    border-color: #991b1b;
+    --bs-card-border-color: var(--line);
+    --bs-card-border-radius: var(--radius);
+    --bs-card-bg: var(--surface);
 }
 
 /* ===== Home: Hero ===== */
 .hero {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    align-items: center;
-    gap: 48px;
     padding: 64px 0;
 }
 
 .hero h1 {
     font-size: 44px;
+    font-weight: 700;
     line-height: 1.1;
     letter-spacing: -1px;
     margin: 0 0 16px 0;
-}
-
-.hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 28px;
 }
 
 .hero-note {
@@ -293,19 +217,7 @@ button:disabled {
 
 /* ===== Home: How It Works step cards ===== */
 .steps {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-}
-
-.steps li {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px;
+    margin-bottom: 0;
 }
 
 .step-number,
@@ -325,6 +237,7 @@ button:disabled {
 
 .steps h3 {
     font-size: 16px;
+    font-weight: 700;
     margin: 14px 0 6px 0;
 }
 
@@ -335,18 +248,8 @@ button:disabled {
 }
 
 /* ===== Home: Risk score cards & badges ===== */
-.risk-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-}
-
 .risk-card {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
     border-top-width: 4px;
-    border-radius: var(--radius);
-    padding: 20px;
 }
 
 .risk-card p {
@@ -359,41 +262,35 @@ button:disabled {
 .risk-card-high   { border-top-color: var(--high); }
 
 .badge {
-    display: inline-block;
     font-size: 13px;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 999px;
+    padding: 5px 10px;
 }
 
 .badge-low    { color: var(--low);    background-color: var(--low-soft); }
 .badge-medium { color: var(--medium); background-color: var(--medium-soft); }
 .badge-high   { color: var(--high);   background-color: var(--high-soft); }
 
-/* Risk level text colors (results page + admin table) */
+/* Risk level text colors (results page + admin stats) */
 .risk-low    { color: var(--low); }
 .risk-medium { color: var(--medium); }
 .risk-high   { color: var(--high); }
 
 /* ===== Home: Tips checklist ===== */
 .tips {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
+    margin-bottom: 0;
 }
 
-.tips li {
+.tip {
     position: relative;
+    height: 100%;
     background-color: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 14px 16px 14px 48px;
 }
 
-.tips li::before {
+.tip::before {
     content: "";
     position: absolute;
     left: 16px;
@@ -407,7 +304,6 @@ button:disabled {
 
 /* ===== Closing call to action ===== */
 .cta {
-    text-align: center;
     border-bottom: none;
 }
 
@@ -418,52 +314,10 @@ button:disabled {
 }
 
 /* ===== Forms ===== */
-label {
-    display: block;
+.form-label {
     font-size: 14px;
     font-weight: 500;
     color: var(--ink);
-    margin-top: 18px;
-    margin-bottom: 6px;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--ink);
-    background-color: var(--surface);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-input:focus,
-textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-form button {
-    margin-top: 24px;
-}
-
-.success-text {
-    color: var(--low);
-    background-color: var(--low-soft);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin: 16px 0 0 0;
-}
-
-.error-text {
-    color: var(--high);
-    margin: 12px 0 0 0;
 }
 
 /* ===== Assessment: question cards ===== */
@@ -473,16 +327,14 @@ form button {
 }
 
 .question {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 18px 20px;
+    margin: 0;
 }
 
 .question-text {
     display: flex;
     align-items: center;
     gap: 12px;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--ink);
     margin: 0 0 14px 0;
@@ -494,20 +346,12 @@ form button {
     padding-left: 44px;
 }
 
-/* Yes / No choices are big clickable boxes */
-label.option {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    padding: 8px 18px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
+.options .btn {
+    min-width: 80px;
+    font-weight: 500;
 }
 
+<<<<<<< HEAD
 label.option:hover {
     border-color: var(--accent);
 }
@@ -581,72 +425,39 @@ label.option input {
 
 /* ===== About: FAQ cards ===== */
 .faq {
+=======
+.question-list {
+>>>>>>> Carbonell
     display: grid;
     gap: 12px;
 }
 
-.faq article {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px 24px;
+/* A question the user skipped, after they press Calculate */
+.question.is-unanswered {
+    border-color: var(--high);
+    box-shadow: 0 0 0 3px var(--high-soft);
 }
 
-.faq h3 {
-    font-size: 17px;
+/* ===== Assessment: results ===== */
+.result-box h3 {
+    font-size: 24px;
+    font-weight: 700;
     margin: 0 0 8px 0;
 }
 
-.faq p {
-    margin: 0;
-}
-
-/* ===== Contact ===== */
-.contact-layout {
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    align-items: start;
-    gap: 24px;
-    border-bottom: none;
-}
-
-.contact-layout form label:first-child {
-    margin-top: 0;
-}
-
-.contact-layout aside h2 {
+.result-box h4 {
     font-size: 18px;
-    margin-bottom: 12px;
+    margin: 24px 0 8px 0;
 }
 
-.info-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.info-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--line);
-}
-
-.info-list li:last-child {
-    border-bottom: none;
+/* Saved-result link under the checklist */
+.share-box {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
 }
 
 /* ===== Login ===== */
-.auth {
-    display: flex;
-    justify-content: center;
-    border-bottom: none;
-}
-
-.auth-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 32px;
-}
-
 .auth-icon {
     width: 40px;
     height: 40px;
@@ -655,29 +466,12 @@ label.option input {
 
 .auth-card h1 {
     font-size: 26px;
+    font-weight: 700;
     margin: 0 0 4px 0;
 }
 
-.auth-card p {
-    color: var(--muted);
-}
-
-.auth-card button {
-    width: 100%;
-}
-
 /* ===== Admin: stats cards ===== */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-}
-
-.stat-card {
-    background-color: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 16px;
+.stat-card .card-body {
     display: flex;
     flex-direction: column;
 }
@@ -697,6 +491,7 @@ label.option input {
     color: var(--muted);
 }
 
+<<<<<<< HEAD
 /* ===== Admin: section header (title + Export CSV link) ===== */
 .section-head {
     display: flex;
@@ -711,11 +506,14 @@ label.option input {
     margin: 0;
 }
 
+=======
+>>>>>>> Carbonell
 /* ===== Admin: charts ===== */
 .chart-title {
     font-size: 15px;
     font-weight: 600;
     margin: 0;
+<<<<<<< HEAD
 }
 
 .chart-caption {
@@ -893,40 +691,215 @@ label.option input {
 /* ===== Admin: tables ===== */
 .table-wrap {
     overflow-x: auto;
+=======
+>>>>>>> Carbonell
 }
 
-table {
+.chart-caption {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 2px 0 16px 0;
+}
+
+/* Column chart: y-axis labels on the left, bars + day labels on the right */
+.trend-plot {
+    display: flex;
+    gap: 8px;
+}
+
+.trend-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 160px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    min-width: 16px;
+    line-height: 1;
+}
+
+.trend-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.trend-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px; /* surface gap between neighbouring bars */
+    height: 160px;
+    border-bottom: 1px solid var(--line);
+    /* faint top gridline at the axis maximum */
+    background: linear-gradient(var(--line), var(--line)) top / 100% 1px no-repeat;
+}
+
+.trend-col {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: default;
+    outline: none;
+}
+
+.trend-col:hover,
+.trend-col:focus-visible {
+    background-color: var(--accent-soft);
+}
+
+.trend-bar {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+    max-width: 24px;
+    background-color: var(--accent);
+    border-radius: 4px 4px 0 0;
+}
+
+.trend-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+}
+
+.trend-labels {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.trend-labels span {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Horizontal bars: question text above a bar with its % at the end */
+.hbar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.hbar-row {
+    border-radius: 6px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    outline: none;
+}
+
+.hbar-row:hover,
+.hbar-row:focus-visible {
+    background-color: var(--accent-soft);
+}
+
+.hbar-label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.hbar-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hbar-fill {
+    display: block;
+    height: 10px;
+    min-width: 2px;
+    max-width: calc(100% - 44px);
+    background-color: var(--accent);
+    border-radius: 0 4px 4px 0;
+}
+
+.hbar-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.chart-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 1080;
+    max-width: 260px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: var(--ink);
+    color: #ffffff;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+@media (max-width: 575.98px) {
+    /* Too narrow for 14 day labels: show every other one */
+    .trend-labels .trend-label-odd {
+        visibility: hidden;
+    }
+}
+
+/* ===== Admin: section header, filters, pager ===== */
+.section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.section-head h2 {
+    margin: 0;
+}
+
+.filter-bar {
+    margin-bottom: 16px;
+}
+
+.filter-bar .form-label {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.pagination {
+    --bs-pagination-active-bg: var(--accent);
+    --bs-pagination-active-border-color: var(--accent);
+    --bs-pagination-color: var(--accent-dark);
+}
+
+/* ===== Admin: tables ===== */
+.table-responsive {
     background-color: var(--surface);
     border: 1px solid var(--line);
+    border-radius: var(--radius);
 }
 
-th,
-td {
-    border-bottom: 1px solid var(--line);
-    padding: 12px 14px;
-    text-align: left;
-    vertical-align: top;
+.table {
+    font-size: 14px;
 }
 
-th {
-    background-color: #f1f5f9;
-    color: var(--ink);
-    font-weight: 600;
+.table th {
     font-size: 13px;
-}
-
-td {
-    color: var(--text);
+    font-weight: 600;
+    color: var(--ink);
 }
 
 .actions {
     white-space: nowrap;
 }
 
-.actions .btn-small {
+.actions .btn {
     margin: 0 4px 4px 0;
 }
 
@@ -935,58 +908,24 @@ td {
 }
 
 /* ===== Footer ===== */
-footer {
-    padding-top: 32px;
-    padding-bottom: 32px;
-    position: relative;
+.site-footer {
+    border-top: 1px solid var(--line);
+    padding: 32px 0;
     font-size: 13px;
     color: var(--muted);
-    text-align: center;
 }
 
-footer p {
+.site-footer p {
     margin: 4px 0;
 }
 
 /* ===== Phones & small screens ===== */
-@media (max-width: 760px) {
-    body > * {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    .site-header::after,
-    footer::before {
-        left: 16px;
-        right: 16px;
-    }
-
-    .site-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    nav {
-        gap: 2px;
-        margin-left: -8px;
-    }
-
-    nav a {
-        font-size: 13px;
-        padding: 6px 8px;
-    }
-
+@media (max-width: 767.98px) {
     section {
         padding: 40px 0;
     }
 
-    .hero,
-    .contact-layout {
-        grid-template-columns: 1fr;
-    }
-
     .hero {
-        gap: 32px;
         padding: 40px 0;
     }
 

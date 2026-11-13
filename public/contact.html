@@ -5,24 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NetGuard – Contact Us</title>
     <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="site-header">
-        <a href="index.html" class="brand">
-            <img src="images/shield.svg" alt="" class="brand-icon">
-            <span>NetGuard</span>
-        </a>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="assessment.html">Start Assessment</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html" aria-current="page">Contact Us</a>
+    <header>
+        <nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
+            <div class="container">
+                <a href="index.html" class="navbar-brand brand">
+                    <img src="images/shield.svg" alt="" class="brand-icon">
+                    <span>NetGuard</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="main-nav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="assessment.html">Start Assessment</a></li>
+                        <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
 
-    <main>
+    <main class="container">
 
         <section class="page-intro">
             <p class="eyebrow">Get in touch</p>
@@ -30,8 +40,10 @@
             <p class="lead">Have a question or need help securing your network? Send us a message.</p>
         </section>
 
-        <section class="contact-layout">
+        <section class="border-0">
+            <div class="row g-4 align-items-start">
 
+<<<<<<< HEAD
             <div class="card">
                 <form id="contact-form">
                     <label for="contact-name">Your Name:</label>
@@ -51,25 +63,58 @@
                 <p id="contact-message" class="success-text" style="display: none;">
                     Thank you! Your message has been received. We'll get back to you within 24 hours.
                 </p>
+=======
+                <div class="col-lg-7">
+                    <div class="card"><div class="card-body p-4">
+                        <form id="contact-form">
+                            <div class="mb-3">
+                                <label for="contact-name" class="form-label">Your Name:</label>
+                                <input type="text" class="form-control" id="contact-name" maxlength="100" placeholder="Enter your name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact-email" class="form-label">Email Address:</label>
+                                <input type="email" class="form-control" id="contact-email" maxlength="254" placeholder="Enter your email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contact-subject" class="form-label">Subject:</label>
+                                <input type="text" class="form-control" id="contact-subject" maxlength="150" placeholder="What is this about?">
+                            </div>
+                            <div class="mb-4">
+                                <label for="contact-text" class="form-label">Message:</label>
+                                <textarea class="form-control" id="contact-text" rows="5" maxlength="2000" placeholder="Describe your concern or question."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send Message</button>
+                        </form>
+                        <div id="contact-message" class="alert alert-success mt-3 mb-0" role="status" style="display: none;">
+                            Thank you! Your message has been received. We'll get back to you within 24 hours.
+                        </div>
+                    </div></div>
+                </div>
+
+                <aside class="col-lg-5">
+                    <div class="card"><div class="card-body p-4">
+                        <h2 class="h5">Other Ways to Reach Us</h2>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item px-0"><strong>Email:</strong> support@netguard.com</li>
+                            <li class="list-group-item px-0"><strong>Response time:</strong> Within 24 hours</li>
+                            <li class="list-group-item px-0"><strong>Hours:</strong> Monday–Friday, 9AM–5PM</li>
+                        </ul>
+                    </div></div>
+                </aside>
+
+>>>>>>> Carbonell
             </div>
-
-            <aside class="card">
-                <h2>Other Ways to Reach Us</h2>
-                <ul class="info-list">
-                    <li><strong>Email:</strong> support@netguard.com</li>
-                    <li><strong>Response time:</strong> Within 24 hours</li>
-                    <li><strong>Hours:</strong> Monday–Friday, 9AM–5PM</li>
-                </ul>
-            </aside>
-
         </section>
 
     </main>
 
-    <footer>
-        <p>Contact: support@netguard.com</p>
-        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    <footer class="site-footer">
+        <div class="container text-center">
+            <p>Contact: support@netguard.com</p>
+            <p>&copy; 2026 NetGuard. All rights reserved.</p>
+        </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 </html>

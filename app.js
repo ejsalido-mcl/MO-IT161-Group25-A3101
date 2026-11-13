@@ -4,6 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+<<<<<<< HEAD
+=======
+const accounts = require("./admin-accounts");
+>>>>>>> Carbonell
 
 // Load settings from a .env file if there is one (see .env.example)
 try {
@@ -16,6 +20,7 @@ const app = express();
 
 // --- SETTINGS ---
 const PORT = process.env.PORT || 3000;
+<<<<<<< HEAD
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "netguard-admin";
 const MESSAGES_FILE = path.join(__dirname, "messages.json");
 const RESULTS_FILE = path.join(__dirname, "results.json");
@@ -24,6 +29,18 @@ const QUESTIONS_FILE = path.join(__dirname, "questions.json");
 // The original 10 questions. Used to create questions.json the first time
 // the server runs; after that, the questions are read from questions.json.
 // (assessment.html still lists q1-q10, so keep the ids in sync with it.)
+=======
+// Where the JSON data files live (the automated tests point this at a temporary folder)
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+const RESULTS_FILE = path.join(DATA_DIR, "results.json");
+const QUESTIONS_FILE = path.join(DATA_DIR, "questions.json");
+const QUESTION_LIMITS = { text: 200, fix: 200 };
+const MAX_QUESTIONS = 30;
+
+// The original 10 questions. Used to create questions.json the first time
+// the server runs; after that, admins edit the questions from the dashboard.
+>>>>>>> Carbonell
 const DEFAULT_QUESTIONS = [
     { id: "q1", text: "Do you use a strong password for your Wi-Fi network?", safeAnswer: "yes", fix: "Use a stronger, unique Wi-Fi password." },
     { id: "q2", text: "Is your Wi-Fi password shared with many people?", safeAnswer: "no", fix: "Limit who knows your Wi-Fi password." },
@@ -46,6 +63,10 @@ const LIMITS = { name: 100, email: 254, subject: 150, message: 2000 };
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
 const loginAttempts = new Map(); // ip -> { count, firstAttempt }
+<<<<<<< HEAD
+=======
+
+>>>>>>> Carbonell
 
 // --- MIDDLEWARE ---
 app.disable("x-powered-by"); // don't advertise that we run Express
@@ -136,6 +157,32 @@ function readQuestions() {
     return readData(QUESTIONS_FILE);
 }
 
+<<<<<<< HEAD
+=======
+// Checks the fields of a new/edited question -> { fields } or { error }.
+// partial: true for edits, where only the fields being changed are sent.
+function readQuestionFields(body, { partial = false } = {}) {
+    const labels = { text: "Question", fix: "Fix" };
+    const fields = {};
+
+    for (const key of ["text", "fix"]) {
+        if (partial && body[key] === undefined) continue;
+        const value = cleanText(body[key]);
+        if (!value) return { error: `${labels[key]} text is required.` };
+        if (value.length > QUESTION_LIMITS[key]) {
+            return { error: `${labels[key]} text is too long (max ${QUESTION_LIMITS[key]} characters).` };
+        }
+        fields[key] = value;
+    }
+    if (!partial || body.safeAnswer !== undefined) {
+        if (!["yes", "no"].includes(body.safeAnswer)) return { error: 'safeAnswer must be "yes" or "no".' };
+        fields.safeAnswer = body.safeAnswer;
+    }
+    if (Object.keys(fields).length === 0) return { error: "Nothing to update." };
+    return { fields };
+}
+
+>>>>>>> Carbonell
 // Scores { questionId: "yes" | "no" } against the current questions.
 // The server does the scoring, so the browser can't send a fake score.
 function scoreAnswers(questions, answers) {
@@ -246,6 +293,29 @@ function queryText(value) {
     return value.trim();
 }
 
+<<<<<<< HEAD
+=======
+// ?page=2&limit=10 -> { page, limit } or { error }
+function readPaging(query) {
+    const page = query.page === undefined ? 1 : Number(query.page);
+    const limit = query.limit === undefined ? 10 : Number(query.limit);
+    if (!Number.isInteger(page) || page < 1) return { error: "page must be a whole number of 1 or more." };
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) return { error: "limit must be a whole number from 1 to 100." };
+    return { page, limit };
+}
+
+function paginate(items, { page, limit }) {
+    const total = items.length;
+    return {
+        items: items.slice((page - 1) * limit, page * limit),
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit))
+    };
+}
+
+>>>>>>> Carbonell
 // ?status=new&q=router -> { items } or { error }
 function filterMessages(query) {
     const status = queryText(query.status);
@@ -258,7 +328,12 @@ function filterMessages(query) {
     }
 
     const needle = search.toLowerCase();
+<<<<<<< HEAD
     const items = readData(MESSAGES_FILE)
+=======
+    // Reversed first, so records saved in the same millisecond still come out newest first
+    const items = readData(MESSAGES_FILE).reverse()
+>>>>>>> Carbonell
         .filter(m => !status || (m.status || "new") === status)
         .filter(m => !needle || [m.name, m.email, m.subject, m.message]
             .some(field => String(field || "").toLowerCase().includes(needle)))
@@ -286,7 +361,12 @@ function filterResults(query) {
     const toTime = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
     if (fromTime > toTime) return { error: "The from date must be on or before the to date." };
 
+<<<<<<< HEAD
     const items = readData(RESULTS_FILE)
+=======
+    // Reversed first, so records saved in the same millisecond still come out newest first
+    const items = readData(RESULTS_FILE).reverse()
+>>>>>>> Carbonell
         .filter(r => !riskLevel || r.riskLevel === riskLevel)
         .filter(r => {
             const time = recordTime(r);
@@ -321,7 +401,57 @@ function localDateKey(date) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+<<<<<<< HEAD
 // --- LOGIN LOCKOUT ---
+=======
+// --- ADMIN ACCOUNTS ---
+
+// Hash of a random password, checked when someone logs in with a username
+// that doesn't exist, so the reply takes just as long as a real wrong password
+// (otherwise the timing would reveal which usernames exist).
+let dummyPasswordHash = null;
+
+// The team's admin accounts, created the first time the server runs
+// (when admins.json doesn't exist yet). Override with INITIAL_ADMINS in .env.
+const INITIAL_ADMINS = (process.env.INITIAL_ADMINS || "roi,evan,lenard,hady")
+    .split(",").map(name => name.trim().toLowerCase()).filter(Boolean);
+
+// First run: create the team's accounts with the shared starting password.
+// Everyone is made to choose their own password the first time they log in.
+async function ensureFirstAdmin() {
+    dummyPasswordHash = await accounts.hashPassword(crypto.randomBytes(16).toString("hex"));
+    if (accounts.readAdmins().length > 0) return;
+
+    const startingPassword = process.env.ADMIN_PASSWORD || accounts.TEMPORARY_PASSWORD;
+    const created = [];
+    for (const name of INITIAL_ADMINS) {
+        const checked = accounts.checkUsername(name);
+        if (checked.error) throw new Error(`INITIAL_ADMINS: "${name}" - ${checked.error}`);
+        created.push(await accounts.newAdminRecord(checked.username, startingPassword, { mustChangePassword: true }));
+    }
+    if (created.length === 0) throw new Error("INITIAL_ADMINS is empty, so no admin account could be created.");
+    accounts.writeAdmins(created);
+    console.log(`Created admin accounts: ${created.map(a => a.username).join(", ")}.`);
+    console.log(`Starting password: ${process.env.ADMIN_PASSWORD ? "the one in ADMIN_PASSWORD" : `"${accounts.TEMPORARY_PASSWORD}"`}. Each person must change it at first login.`);
+}
+
+function warnAboutStartingPasswords() {
+    const pending = accounts.readAdmins().filter(a => a.mustChangePassword).map(a => a.username);
+    if (pending.length) {
+        console.warn(`Note: these accounts haven't chosen their own password yet: ${pending.join(", ")}.`);
+    }
+}
+
+// The logged-in admin for this request, or null. A session stops working
+// if its account was deleted or its password changed after it logged in.
+function currentAdmin(req) {
+    if (!req.session.adminId) return null;
+    const admin = accounts.readAdmins().find(a => a.id === req.session.adminId);
+    if (!admin) return null;
+    if (admin.passwordChangedAt && req.session.loginAt < Date.parse(admin.passwordChangedAt)) return null;
+    return admin;
+}
+>>>>>>> Carbonell
 
 function isLockedOut(ip) {
     const entry = loginAttempts.get(ip);
@@ -342,13 +472,36 @@ function recordFailedLogin(ip) {
     }
 }
 
+<<<<<<< HEAD
 // Only let logged-in admins through
 function requireAdmin(req, res, next) {
     if (req.session.isAdmin) return next();
+=======
+// Any logged-in admin, even one who still has to change their password
+// (used only for the change-password page and the API it needs)
+function requireLogin(req, res, next) {
+    const admin = currentAdmin(req);
+    if (admin) {
+        req.admin = admin;
+        return next();
+    }
+>>>>>>> Carbonell
     if (req.path.startsWith("/api/")) {
         return res.status(401).json({ error: "Please log in." });
     }
     res.redirect("/login");
+}
+
+// Logged-in admins who have chosen their own password. Everyone else is
+// sent to the change-password page first.
+function requireAdmin(req, res, next) {
+    requireLogin(req, res, () => {
+        if (!req.admin.mustChangePassword) return next();
+        if (req.path.startsWith("/api/")) {
+            return res.status(403).json({ error: "Please change your password first.", mustChangePassword: true });
+        }
+        res.redirect("/change-password");
+    });
 }
 
 // --- FRONTEND ROUTES ---
@@ -357,37 +510,153 @@ app.get("/assessment", (req, res) => res.sendFile(path.join(__dirname, "public",
 app.get("/about", (req, res) => res.sendFile(path.join(__dirname, "public", "about.html")));
 app.get("/contact", (req, res) => res.sendFile(path.join(__dirname, "public", "contact.html")));
 app.get("/login", (req, res) => {
-    if (req.session.isAdmin) return res.redirect("/admin");
+    const admin = currentAdmin(req);
+    if (admin) return res.redirect(admin.mustChangePassword ? "/change-password" : "/admin");
     res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 app.get("/result", (req, res) => res.sendFile(path.join(__dirname, "public", "result.html")));
 app.get("/admin", requireAdmin, (req, res) => {
     res.sendFile(path.join(__dirname, "private", "admin.html"));
 });
+app.get("/change-password", requireLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, "private", "change-password.html"));
+});
 
 // --- AUTHENTICATION ---
+<<<<<<< HEAD
 app.post("/login", (req, res) => {
+=======
+app.post("/login", async (req, res) => {
+>>>>>>> Carbonell
     const ip = req.ip;
     if (isLockedOut(ip)) {
         return res.status(429).json({ error: "Too many failed attempts. Please try again in 15 minutes." });
     }
 
+<<<<<<< HEAD
     const password = String(req.body.password || "");
     if (password !== ADMIN_PASSWORD) {
         recordFailedLogin(ip);
         return res.status(401).json({ error: "Wrong password." });
     }
     loginAttempts.delete(ip);
+=======
+    const { username, password } = req.body;
+    if (typeof username !== "string" || !username.trim() || typeof password !== "string" || !password) {
+        return res.status(400).json({ error: "Please enter your username and password." });
+    }
+
+    const name = username.trim().toLowerCase();
+    const admin = accounts.readAdmins().find(a => a.username === name);
+    // Always run the (slow) password check, even for unknown usernames
+    const tooLong = password.length > accounts.PASSWORD_MAX;
+    const correct = await accounts.verifyPassword(tooLong ? "" : password, admin ? admin.passwordHash : dummyPasswordHash);
+    if (!admin || !correct || tooLong) {
+        recordFailedLogin(ip);
+        // Same message either way, so it doesn't reveal which usernames exist
+        return res.status(401).json({ error: "Wrong username or password." });
+    }
+
+    loginAttempts.delete(ip);
+    const now = Date.now();
+    const all = accounts.readAdmins();
+    const record = all.find(a => a.id === admin.id);
+    if (record) {
+        record.lastLoginAt = new Date(now).toISOString();
+        accounts.writeAdmins(all);
+    }
+>>>>>>> Carbonell
 
     req.session.regenerate(err => {
         if (err) return res.status(500).json({ error: "Login failed." });
-        req.session.isAdmin = true;
-        res.json({ message: "Logged in." });
+        req.session.adminId = admin.id;
+        req.session.loginAt = now;
+        res.json({
+            message: "Logged in.",
+            username: admin.username,
+            // The login page sends these people to /change-password first
+            mustChangePassword: Boolean(admin.mustChangePassword)
+        });
     });
 });
 
 app.post("/logout", (req, res) => {
     req.session.destroy(() => res.json({ message: "Logged out." }));
+});
+
+// Who is logged in (works before the first password change too)
+app.get("/api/me", requireLogin, (req, res) => res.json(accounts.publicAdmin(req.admin)));
+
+// Change your own password: { currentPassword, newPassword }
+app.post("/api/me/password", requireLogin, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    if (typeof currentPassword !== "string" || !currentPassword || currentPassword.length > accounts.PASSWORD_MAX) {
+        return res.status(400).json({ error: "Please enter your current password." });
+    }
+    const problem = accounts.checkNewPassword(newPassword, req.admin.username);
+    if (problem) return res.status(400).json({ error: problem });
+    if (newPassword === currentPassword) {
+        return res.status(400).json({ error: "The new password must be different from the current one." });
+    }
+
+    if (!(await accounts.verifyPassword(currentPassword, req.admin.passwordHash))) {
+        recordFailedLogin(req.ip);
+        return res.status(400).json({ error: "Your current password is wrong." });
+    }
+    const newHash = await accounts.hashPassword(newPassword);
+
+    const now = Date.now();
+    const all = accounts.readAdmins();
+    const record = all.find(a => a.id === req.admin.id);
+    if (!record) return res.status(404).json({ error: "Your account no longer exists." });
+    record.passwordHash = newHash;
+    record.passwordChangedAt = new Date(now).toISOString();
+    record.mustChangePassword = false;
+    accounts.writeAdmins(all);
+
+    // Logs out every other session of this account; this one stays logged in
+    req.session.loginAt = now;
+    res.json({ message: "Password changed. Any other sessions of this account were logged out." });
+});
+
+// --- Managing admin accounts ---
+
+app.get("/api/admins", requireAdmin, (req, res) => {
+    res.json(accounts.readAdmins().map(a => ({ ...accounts.publicAdmin(a), isYou: a.id === req.admin.id })));
+});
+
+// { username, password } - the password is temporary: the new admin
+// must choose their own the first time they log in
+app.post("/api/admins", requireAdmin, async (req, res) => {
+    const checked = accounts.checkUsername(req.body.username);
+    if (checked.error) return res.status(400).json({ error: checked.error });
+    const problem = accounts.checkNewPassword(req.body.password, checked.username, { temporary: true });
+    if (problem) return res.status(400).json({ error: problem });
+
+    const record = await accounts.newAdminRecord(checked.username, req.body.password, { mustChangePassword: true });
+
+    const all = accounts.readAdmins();
+    if (all.some(a => a.username === checked.username)) {
+        return res.status(409).json({ error: "That username is already taken." });
+    }
+    if (all.length >= accounts.MAX_ADMINS) {
+        return res.status(400).json({ error: `There can be at most ${accounts.MAX_ADMINS} admin accounts.` });
+    }
+    all.push(record);
+    accounts.writeAdmins(all);
+    res.status(201).json(accounts.publicAdmin(record));
+});
+
+app.delete("/api/admins/:id", requireAdmin, (req, res) => {
+    if (req.params.id === req.admin.id) {
+        return res.status(400).json({ error: "You can't delete your own account while you're logged in to it." });
+    }
+    const all = accounts.readAdmins();
+    const remaining = all.filter(a => a.id !== req.params.id);
+    if (remaining.length === all.length) return res.status(404).json({ error: "Account not found." });
+
+    accounts.writeAdmins(remaining);
+    res.json({ message: "Account deleted." });
 });
 
 // --- BACKEND FEATURE 1: Contact Messages (CRUD) ---
@@ -426,7 +695,26 @@ app.post("/contact", (req, res) => {
     res.json({ message: "Message saved successfully!" });
 });
 
-app.get("/api/messages", requireAdmin, (req, res) => res.json(readData(MESSAGES_FILE)));
+// Newest first. Optional filters: ?status=new|resolved &q=search text
+// Paging: ?page=1 &limit=10 (max 100)
+app.get("/api/messages", requireAdmin, (req, res) => {
+    const paging = readPaging(req.query);
+    if (paging.error) return res.status(400).json({ error: paging.error });
+    const filtered = filterMessages(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    res.json(paginate(filtered.items, paging));
+});
+
+// Same filters as the list, every matching row, as a CSV download
+app.get("/api/messages/export", requireAdmin, (req, res) => {
+    const filtered = filterMessages(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    sendCsv(res, "messages",
+        ["Date", "Name", "Email", "Subject", "Message", "Status"],
+        filtered.items.map(m => [m.date, m.name, m.email, m.subject, m.message, m.status || "new"]));
+});
 
 // Same filters as the list, every matching row, as a CSV download
 app.get("/api/messages/export", requireAdmin, (req, res) => {
@@ -460,7 +748,110 @@ app.delete("/api/messages/:id", requireAdmin, (req, res) => {
     res.json({ message: "Message deleted." });
 });
 
+<<<<<<< HEAD
 // --- BACKEND FEATURE 2: Assessment Results ---
+
+// Body: { "answers": { "q1": "yes", "q2": "no", ... } }
+// The server scores the answers, saves them, and sends back the result.
+app.post("/save-result", (req, res) => {
+    const questions = readQuestions();
+    if (questions.length === 0) return res.status(503).json({ error: "The assessment has no questions yet." });
+
+    const scored = scoreAnswers(questions, req.body.answers);
+    if (scored.error) return res.status(400).json({ error: scored.error });
+
+    const results = readData(RESULTS_FILE);
+    const id = crypto.randomUUID();
+    results.push({
+        id,
+        riskLevel: scored.riskLevel,
+        score: scored.score,
+        total: scored.total,
+        answers: scored.answers,
+        checklist: scored.checklist,
+        date: new Date().toLocaleString(),
+        createdAt: new Date().toISOString()
+    });
+    writeData(RESULTS_FILE, results);
+
+    // The id lets the user come back to this result later at /result?id=...
+    res.json({
+        message: "Assessment saved successfully!",
+        id,
+        riskLevel: scored.riskLevel,
+        score: scored.score,
+        total: scored.total,
+        checklist: scored.checklist
+    });
+=======
+// --- BACKEND FEATURE 2: Assessment questions ---
+
+// Public: what the assessment page shows (no answers or fixes)
+app.get("/api/questions", (req, res) => {
+    res.json(readQuestions().map(({ id, text }) => ({ id, text })));
+>>>>>>> Carbonell
+});
+
+// Admin: everything, for the question editor
+app.get("/api/questions/full", requireAdmin, (req, res) => res.json(readQuestions()));
+
+<<<<<<< HEAD
+=======
+app.post("/api/questions", requireAdmin, (req, res) => {
+    const questions = readQuestions();
+    if (questions.length >= MAX_QUESTIONS) {
+        return res.status(400).json({ error: `The assessment can have at most ${MAX_QUESTIONS} questions.` });
+    }
+    const checked = readQuestionFields(req.body);
+    if (checked.error) return res.status(400).json({ error: checked.error });
+
+    const question = { id: "q-" + crypto.randomUUID().slice(0, 8), ...checked.fields };
+    questions.push(question);
+    writeData(QUESTIONS_FILE, questions);
+    res.status(201).json(question);
+});
+
+app.patch("/api/questions/:id", requireAdmin, (req, res) => {
+    const questions = readQuestions();
+    const question = questions.find(q => q.id === req.params.id);
+    if (!question) return res.status(404).json({ error: "Question not found." });
+    const checked = readQuestionFields(req.body, { partial: true });
+    if (checked.error) return res.status(400).json({ error: checked.error });
+
+    Object.assign(question, checked.fields);
+    writeData(QUESTIONS_FILE, questions);
+    res.json(question);
+});
+
+// Move a question one place up or down: { "direction": "up" | "down" }
+app.post("/api/questions/:id/move", requireAdmin, (req, res) => {
+    const { direction } = req.body;
+    if (!["up", "down"].includes(direction)) return res.status(400).json({ error: 'direction must be "up" or "down".' });
+
+    const questions = readQuestions();
+    const index = questions.findIndex(q => q.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: "Question not found." });
+    const target = direction === "up" ? index - 1 : index + 1;
+    if (target < 0 || target >= questions.length) {
+        return res.status(400).json({ error: `That question is already at the ${direction === "up" ? "top" : "bottom"}.` });
+    }
+
+    [questions[index], questions[target]] = [questions[target], questions[index]];
+    writeData(QUESTIONS_FILE, questions);
+    res.json({ message: "Question moved." });
+});
+
+app.delete("/api/questions/:id", requireAdmin, (req, res) => {
+    const questions = readQuestions();
+    const remaining = questions.filter(q => q.id !== req.params.id);
+    if (remaining.length === questions.length) return res.status(404).json({ error: "Question not found." });
+    if (remaining.length === 0) return res.status(400).json({ error: "The assessment needs at least one question." });
+
+    writeData(QUESTIONS_FILE, remaining);
+    res.json({ message: "Question deleted." });
+});
+
+// --- BACKEND FEATURE 3: Assessment Results ---
 
 // Body: { "answers": { "q1": "yes", "q2": "no", ... } }
 // The server scores the answers, saves them, and sends back the result.
@@ -496,8 +887,19 @@ app.post("/save-result", (req, res) => {
     });
 });
 
-app.get("/api/results", requireAdmin, (req, res) => res.json(readData(RESULTS_FILE)));
+// Admins see every result, newest first.
+// Optional filters: ?riskLevel=Low|Medium|High &from=YYYY-MM-DD &to=YYYY-MM-DD
+// Paging: ?page=1 &limit=10 (max 100)
+app.get("/api/results", requireAdmin, (req, res) => {
+    const paging = readPaging(req.query);
+    if (paging.error) return res.status(400).json({ error: paging.error });
+    const filtered = filterResults(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
 
+    res.json(paginate(filtered.items, paging));
+});
+
+>>>>>>> Carbonell
 // Same filters as the list, every matching row, as a CSV download.
 // (Must come before /api/results/:id, or "export" would be read as an id.)
 app.get("/api/results/export", requireAdmin, (req, res) => {
@@ -609,4 +1011,19 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Something went wrong on the server." });
 });
 
+<<<<<<< HEAD
 app.listen(PORT, () => console.log(`NetGuard backend running on port ${PORT}`));
+=======
+// Set up the admin accounts first, then start taking requests
+ensureFirstAdmin()
+    .then(() => {
+        warnAboutStartingPasswords();
+        // PORT=0 lets the system pick a free port (used by the automated tests)
+        const server = app.listen(PORT, () => console.log(`NetGuard backend running on port ${server.address().port}`));
+    })
+    .catch(err => {
+        console.error("Could not load admin accounts (admins.json):", err.message);
+        console.error("Fix or remove admins.json, or reset an account with: npm run admin -- reset-password <username>");
+        process.exit(1);
+    });
+>>>>>>> Carbonell

@@ -5,24 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NetGuard – Start Assessment</title>
     <link rel="icon" href="images/shield.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="site-header">
-        <a href="index.html" class="brand">
-            <img src="images/shield.svg" alt="" class="brand-icon">
-            <span>NetGuard</span>
-        </a>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="assessment.html" aria-current="page">Start Assessment</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
+    <header>
+        <nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
+            <div class="container">
+                <a href="index.html" class="navbar-brand brand">
+                    <img src="images/shield.svg" alt="" class="brand-icon">
+                    <span>NetGuard</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="main-nav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="assessment.html">Start Assessment</a></li>
+                        <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
 
-    <main>
+    <main class="container">
 
         <section class="page-intro">
             <p class="eyebrow">Wi-Fi security check</p>
@@ -33,99 +43,29 @@
         <section>
             <form id="assessment-form" class="assessment-form">
 
-                <div class="question">
-                    <p class="question-text"><span class="question-number">1</span> Do you use a strong password for your Wi-Fi network?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q1" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q1" value="no"> No</label>
-                    </div>
+                <div id="questions-container" class="question-list" aria-live="polite">
+                    <p class="text-body-secondary">Loading questions...</p>
                 </div>
 
-                <div class="question">
-                    <p class="question-text"><span class="question-number">2</span> Is your Wi-Fi password shared with many people?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q2" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q2" value="no"> No</label>
-                    </div>
-                </div>
+                <div id="assessment-error" class="alert alert-danger mb-0" role="alert" style="display: none;"></div>
 
-                <div class="question">
-                    <p class="question-text"><span class="question-number">3</span> Is your router's admin password still the default one?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q3" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q3" value="no"> No</label>
-                    </div>
+                <div>
+                    <button type="submit" class="btn btn-primary btn-lg" disabled>Calculate My Risk Score</button>
                 </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">4</span> Do you keep your router's firmware updated?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q4" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q4" value="no"> No</label>
-                    </div>
-                </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">5</span> Do you use WPA2 or WPA3 encryption?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q5" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q5" value="no"> No</label>
-                    </div>
-                </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">6</span> Is your Wi-Fi network hidden from public view?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q6" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q6" value="no"> No</label>
-                    </div>
-                </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">7</span> Do you have a guest network for visitors?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q7" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q7" value="no"> No</label>
-                    </div>
-                </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">8</span> Do you regularly check who is connected to your network?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q8" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q8" value="no"> No</label>
-                    </div>
-                </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">9</span> Is your router placed in a secure location?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q9" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q9" value="no"> No</label>
-                    </div>
-                </div>
-
-                <div class="question">
-                    <p class="question-text"><span class="question-number">10</span> Do you use a firewall on your network?</p>
-                    <div class="options">
-                        <label class="option"><input type="radio" name="q10" value="yes"> Yes</label>
-                        <label class="option"><input type="radio" name="q10" value="no"> No</label>
-                    </div>
-                </div>
-
-                <button>Calculate My Risk Score</button>
 
             </form>
         </section>
 
         <section class="results-section" id="results">
             <h2>Your Results</h2>
-            <p id="results-placeholder" class="placeholder"><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
+            <p id="results-placeholder" class="text-body-secondary"><em>Your risk score and personalized checklist will appear here after you complete the assessment.</em></p>
 
-            <div class="result-box" id="result-box" style="display: none;">
-                <h3 id="risk-level">Risk Level: —</h3>
-                <p id="risk-summary">—</p>
+            <div class="card result-box" id="result-box" style="display: none;">
+                <div class="card-body">
+                    <h3 id="risk-level">Risk Level: —</h3>
+                    <p id="risk-summary">—</p>
 
+<<<<<<< HEAD
                 <h4>Recommended Fixes</h4>
                 <ul id="checklist"></ul>
 
@@ -134,6 +74,17 @@
                     <div class="share-row">
                         <input type="text" id="share-link" readonly>
                         <button type="button" id="copy-link" class="button-secondary">Copy link</button>
+=======
+                    <h4>Recommended Fixes</h4>
+                    <ul id="checklist" class="list-group list-group-flush"></ul>
+
+                    <div id="share-box" class="share-box" style="display: none;">
+                        <label for="share-link" class="form-label">Save this link to see your result again:</label>
+                        <div class="input-group">
+                            <input type="text" id="share-link" class="form-control" readonly>
+                            <button type="button" id="copy-link" class="btn btn-outline-primary">Copy link</button>
+                        </div>
+>>>>>>> Carbonell
                     </div>
                 </div>
             </div>
@@ -141,10 +92,13 @@
 
     </main>
 
-    <footer>
-        <p>Contact: support@netguard.com</p>
-        <p>&copy; 2026 NetGuard. All rights reserved.</p>
+    <footer class="site-footer">
+        <div class="container text-center">
+            <p>Contact: support@netguard.com</p>
+            <p>&copy; 2026 NetGuard. All rights reserved.</p>
+        </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 </html>
