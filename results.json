@@ -90,5 +90,79 @@
     "score": 6,
     "date": "11/9/2026, 6:46:05 PM",
     "createdAt": "2026-11-09T10:46:05.392Z"
+  },
+  {
+    "id": "fef0621e-e43f-473c-bc62-5ffd2660f4e4",
+    "riskLevel": "Low",
+    "score": 8,
+    "total": 10,
+    "answers": [
+      {
+        "questionId": "q1",
+        "question": "Do you use a strong password for your Wi-Fi network?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q2",
+        "question": "Is your Wi-Fi password shared with many people?",
+        "answer": "yes",
+        "safe": false
+      },
+      {
+        "questionId": "q3",
+        "question": "Is your router's admin password still the default one?",
+        "answer": "yes",
+        "safe": false
+      },
+      {
+        "questionId": "q4",
+        "question": "Do you keep your router's firmware updated?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q5",
+        "question": "Do you use WPA2 or WPA3 encryption?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q6",
+        "question": "Is your Wi-Fi network hidden from public view?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q7",
+        "question": "Do you have a guest network for visitors?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q8",
+        "question": "Do you regularly check who is connected to your network?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q9",
+        "question": "Is your router placed in a secure location?",
+        "answer": "yes",
+        "safe": true
+      },
+      {
+        "questionId": "q10",
+        "question": "Do you use a firewall on your network?",
+        "answer": "yes",
+        "safe": true
+      }
+    ],
+    "checklist": [
+      "Limit who knows your Wi-Fi password.",
+      "Change your router's default admin password."
+    ],
+    "date": "11/13/2026, 11:02:49 PM",
+    "createdAt": "2026-11-13T15:02:49.552Z"
   }
 ]

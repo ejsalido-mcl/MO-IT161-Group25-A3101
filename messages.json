@@ -5,7 +5,17 @@
     "email": "test@gmail.com",
     "subject": "Test",
     "message": "Test",
-    "status": "new",
+    "status": "resolved",
     "date": "11/9/2026, 4:59:01 PM"
+  },
+  {
+    "id": "14244425-6d1d-46ab-9f8b-649197b86282",
+    "name": "test2",
+    "email": "test2@gmail.com",
+    "subject": "testing",
+    "message": "testing locally",
+    "status": "resolved",
+    "date": "11/13/2026, 11:04:05 PM",
+    "createdAt": "2026-11-13T15:04:05.653Z"
   }
 ]
