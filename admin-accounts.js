@@ -17,7 +17,10 @@ const { promisify } = require("util");
 
 const scrypt = promisify(crypto.scrypt);
 
-const ADMINS_FILE = path.join(__dirname, "admins.json");
+// Read each time (not once at startup) so DATA_DIR from .env is respected
+function adminsFile() {
+    return path.join(process.env.DATA_DIR || __dirname, "admins.json");
+}
 const USERNAME_PATTERN = /^[a-z0-9._-]{3,32}$/;
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 128;
@@ -48,7 +51,7 @@ async function verifyPassword(password, stored) {
 function readAdmins() {
     let text;
     try {
-        text = fs.readFileSync(ADMINS_FILE, "utf8");
+        text = fs.readFileSync(adminsFile(), "utf8");
     } catch (err) {
         if (err.code === "ENOENT") return [];
         throw err;
@@ -61,9 +64,10 @@ function readAdmins() {
 // Write to a temporary file, then rename it into place, so a crash
 // mid-write can never leave a half-written admins.json
 function writeAdmins(admins) {
-    const temp = ADMINS_FILE + ".tmp";
+    const file = adminsFile();
+    const temp = file + ".tmp";
     fs.writeFileSync(temp, JSON.stringify(admins, null, 2), { mode: 0o600 });
-    fs.renameSync(temp, ADMINS_FILE);
+    fs.renameSync(temp, file);
 }
 
 // -> { username } (lowercased) or { error }
@@ -117,7 +121,7 @@ function publicAdmin(admin) {
 }
 
 module.exports = {
-    ADMINS_FILE,
+    adminsFile,
     TEMPORARY_PASSWORD,
     PASSWORD_MAX,
     MAX_ADMINS,

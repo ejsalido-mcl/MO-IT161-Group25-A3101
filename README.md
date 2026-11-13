@@ -30,6 +30,7 @@ Behind the scenes, a Node.js/Express backend scores the answers, stores results 
 - [API Reference](#-api-reference)
 - [Data & Privacy](#-data--privacy)
 - [Security](#️-security)
+- [Testing](#-testing)
 - [Design](#-design)
 - [Team](#-team)
 - [Course](#-course)
@@ -116,9 +117,16 @@ MO-IT161-Group25-A3101/
 │   ├── style.css          # Theme on top of Bootstrap
 │   ├── script.js          # All front-end logic
 │   └── images/
-└── private/               # Only sent to logged-in admins
-    ├── admin.html         # Admin dashboard
-    └── change-password.html
+├── private/               # Only sent to logged-in admins
+│   ├── admin.html         # Admin dashboard
+│   └── change-password.html
+├── test/                  # Automated tests (npm test)
+│   ├── helpers.js         # Starts a throwaway server per test file
+│   └── *.test.js          # 70 tests: pages, assessment, contact, auth, dashboard, stress
+└── docs/
+    ├── TEST-CASES.md      # Test case document (steps, expected vs. actual)
+    ├── DEFECT-LOG.md      # Bugs found, root causes, fixes, regression tests
+    └── test-results.txt   # Output of the latest npm run test:report
 ```
 
 ---
@@ -295,6 +303,33 @@ Results are only reachable by their random ID link or by admins.
 - **Output escaping:** user-submitted text is escaped before it's shown on the dashboard; CSV exports neutralize spreadsheet formulas.
 - **Safe errors:** JSON error messages with no stack traces; `X-Powered-By` removed; `nosniff`, `X-Frame-Options` and `Referrer-Policy` headers set.
 - **No secrets in git:** `admins.json` and `.env` are ignored.
+
+---
+
+## 🧪 Testing
+
+NetGuard has an automated test suite of **70 tests** using Node's built-in test runner, with no extra packages to install.
+
+```bash
+npm test               # run all tests (about 3 seconds)
+npm run test:report    # run them and save the results to docs/test-results.txt
+```
+
+Each test file starts its own server on a free port with a temporary data folder, so tests never touch the real `messages.json`, `results.json` or `admins.json`.
+
+| Test file | What it covers |
+|-----------|----------------|
+| `test/pages-and-security.test.js` | Pages load, private files are protected, path traversal, security headers, error handling |
+| `test/assessment.test.js` | Questions, server-side scoring with risk-level boundaries, saved results, result links |
+| `test/contact.test.js` | Contact validation and length limits, email notification, header injection |
+| `test/auth.test.js` | Admin accounts, forced password change, sessions, brute-force lockout, CLI |
+| `test/admin-dashboard.test.js` | Admin access control, filters and paging, CSV export, stats, question editor |
+| `test/stress.test.js` | 200 simultaneous assessments, 100 messages, 300 reads: no failures, no lost data |
+
+**Documentation:**
+- [Test Cases](docs/TEST-CASES.md): every test case with steps, test data, and expected vs. actual results, plus manual UI checks and a requirements coverage table.
+- [Defect Log](docs/DEFECT-LOG.md): every bug found, its root cause, the fix commit and its regression test.
+- [Latest test results](docs/test-results.txt)
 
 ---
 

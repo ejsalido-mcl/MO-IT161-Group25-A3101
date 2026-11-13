@@ -17,9 +17,11 @@ const app = express();
 
 // --- SETTINGS ---
 const PORT = process.env.PORT || 3000;
-const MESSAGES_FILE = path.join(__dirname, "messages.json");
-const RESULTS_FILE = path.join(__dirname, "results.json");
-const QUESTIONS_FILE = path.join(__dirname, "questions.json");
+// Where the JSON data files live (the automated tests point this at a temporary folder)
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+const RESULTS_FILE = path.join(DATA_DIR, "results.json");
+const QUESTIONS_FILE = path.join(DATA_DIR, "questions.json");
 const QUESTION_LIMITS = { text: 200, fix: 200 };
 const MAX_QUESTIONS = 30;
 
@@ -303,7 +305,8 @@ function filterMessages(query) {
     }
 
     const needle = search.toLowerCase();
-    const items = readData(MESSAGES_FILE)
+    // Reversed first, so records saved in the same millisecond still come out newest first
+    const items = readData(MESSAGES_FILE).reverse()
         .filter(m => !status || (m.status || "new") === status)
         .filter(m => !needle || [m.name, m.email, m.subject, m.message]
             .some(field => String(field || "").toLowerCase().includes(needle)))
@@ -331,7 +334,8 @@ function filterResults(query) {
     const toTime = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
     if (fromTime > toTime) return { error: "The from date must be on or before the to date." };
 
-    const items = readData(RESULTS_FILE)
+    // Reversed first, so records saved in the same millisecond still come out newest first
+    const items = readData(RESULTS_FILE).reverse()
         .filter(r => !riskLevel || r.riskLevel === riskLevel)
         .filter(r => {
             const time = recordTime(r);
@@ -907,7 +911,8 @@ app.use((err, req, res, next) => {
 ensureFirstAdmin()
     .then(() => {
         warnAboutStartingPasswords();
-        app.listen(PORT, () => console.log(`NetGuard backend running on port ${PORT}`));
+        // PORT=0 lets the system pick a free port (used by the automated tests)
+        const server = app.listen(PORT, () => console.log(`NetGuard backend running on port ${server.address().port}`));
     })
     .catch(err => {
         console.error("Could not load admin accounts (admins.json):", err.message);

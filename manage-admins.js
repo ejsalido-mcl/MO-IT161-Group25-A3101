@@ -12,8 +12,16 @@
    in your terminal history. The server doesn't need restarting.
    ============================================ */
 
+const path = require("path");
 const readline = require("readline");
 const accounts = require("./admin-accounts");
+
+// Same settings as the server (e.g. DATA_DIR)
+try {
+    process.loadEnvFile(path.join(__dirname, ".env"));
+} catch {
+    // no .env file
+}
 
 const rl = readline.createInterface({
     input: process.stdin,
