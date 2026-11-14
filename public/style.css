@@ -351,7 +351,83 @@ section h2 {
     font-weight: 500;
 }
 
+<<<<<<< HEAD
+label.option:hover {
+    border-color: var(--accent);
+}
+
+label.option:has(input:checked) {
+    border-color: var(--accent);
+    background-color: var(--accent-soft);
+    color: var(--accent-dark);
+}
+
+label.option input {
+    margin: 0;
+    accent-color: var(--accent);
+}
+
+.assessment-form button {
+    justify-self: start;
+    margin-top: 12px;
+}
+
+/* ===== Assessment: results ===== */
+.placeholder {
+    color: var(--muted);
+}
+
+.result-box {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.result-box h3 {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+}
+
+.result-box h4 {
+    margin: 24px 0 8px 0;
+}
+
+#checklist,
+#saved-checklist {
+    padding-left: 20px;
+}
+
+#checklist li,
+#saved-checklist li {
+    margin-bottom: 6px;
+}
+
+/* Saved-result link under the checklist */
+.share-box {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.share-box label {
+    margin-top: 0;
+}
+
+.share-row {
+    display: flex;
+    gap: 8px;
+}
+
+.share-row button {
+    white-space: nowrap;
+}
+
+/* ===== About: FAQ cards ===== */
+.faq {
+=======
 .question-list {
+>>>>>>> Carbonell
     display: grid;
     gap: 12px;
 }
@@ -415,11 +491,208 @@ section h2 {
     color: var(--muted);
 }
 
+<<<<<<< HEAD
+/* ===== Admin: section header (title + Export CSV link) ===== */
+.section-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.section-head h2 {
+    margin: 0;
+}
+
+=======
+>>>>>>> Carbonell
 /* ===== Admin: charts ===== */
 .chart-title {
     font-size: 15px;
     font-weight: 600;
     margin: 0;
+<<<<<<< HEAD
+}
+
+.chart-caption {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 2px 0 16px 0;
+}
+
+/* Column chart: y-axis labels on the left, bars + day labels on the right */
+.trend-plot {
+    display: flex;
+    gap: 8px;
+}
+
+.trend-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 160px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    min-width: 16px;
+    line-height: 1;
+}
+
+.trend-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.trend-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px; /* surface gap between neighbouring bars */
+    height: 160px;
+    border-bottom: 1px solid var(--line);
+    /* faint top gridline at the axis maximum */
+    background: linear-gradient(var(--line), var(--line)) top / 100% 1px no-repeat;
+}
+
+.trend-col {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: default;
+    outline: none;
+}
+
+.trend-col:hover,
+.trend-col:focus-visible {
+    background-color: var(--accent-soft);
+}
+
+.trend-bar {
+    width: 100%;
+    max-width: 24px;
+    background-color: var(--accent);
+    border-radius: 4px 4px 0 0;
+}
+
+.trend-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+}
+
+.trend-labels {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.trend-labels span {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Horizontal bars: question text above a bar with its % at the end */
+.hbar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 12px;
+}
+
+.hbar-row {
+    border-radius: 6px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    outline: none;
+}
+
+.hbar-row:hover,
+.hbar-row:focus-visible {
+    background-color: var(--accent-soft);
+}
+
+.hbar-label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.hbar-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hbar-fill {
+    display: block;
+    height: 10px;
+    min-width: 2px;
+    max-width: calc(100% - 44px);
+    background-color: var(--accent);
+    border-radius: 0 4px 4px 0;
+}
+
+.hbar-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.chart-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 1080;
+    max-width: 260px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background-color: var(--ink);
+    color: #ffffff;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+@media (max-width: 575.98px) {
+    /* Too narrow for 14 day labels: show every other one */
+    .trend-labels .trend-label-odd {
+        visibility: hidden;
+    }
+}
+
+/* Two chart cards side by side (one column on phones) */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+/* Hidden on screen, still read by screen readers (chart data table) */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+/* ===== Admin: tables ===== */
+.table-wrap {
+    overflow-x: auto;
+=======
+>>>>>>> Carbonell
 }
 
 .chart-caption {

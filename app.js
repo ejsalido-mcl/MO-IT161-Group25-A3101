@@ -4,7 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+<<<<<<< HEAD
+=======
 const accounts = require("./admin-accounts");
+>>>>>>> Carbonell
 
 // Load settings from a .env file if there is one (see .env.example)
 try {
@@ -17,6 +20,16 @@ const app = express();
 
 // --- SETTINGS ---
 const PORT = process.env.PORT || 3000;
+<<<<<<< HEAD
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "netguard-admin";
+const MESSAGES_FILE = path.join(__dirname, "messages.json");
+const RESULTS_FILE = path.join(__dirname, "results.json");
+const QUESTIONS_FILE = path.join(__dirname, "questions.json");
+
+// The original 10 questions. Used to create questions.json the first time
+// the server runs; after that, the questions are read from questions.json.
+// (assessment.html still lists q1-q10, so keep the ids in sync with it.)
+=======
 // Where the JSON data files live (the automated tests point this at a temporary folder)
 const DATA_DIR = process.env.DATA_DIR || __dirname;
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
@@ -27,6 +40,7 @@ const MAX_QUESTIONS = 30;
 
 // The original 10 questions. Used to create questions.json the first time
 // the server runs; after that, admins edit the questions from the dashboard.
+>>>>>>> Carbonell
 const DEFAULT_QUESTIONS = [
     { id: "q1", text: "Do you use a strong password for your Wi-Fi network?", safeAnswer: "yes", fix: "Use a stronger, unique Wi-Fi password." },
     { id: "q2", text: "Is your Wi-Fi password shared with many people?", safeAnswer: "no", fix: "Limit who knows your Wi-Fi password." },
@@ -49,7 +63,10 @@ const LIMITS = { name: 100, email: 254, subject: 150, message: 2000 };
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
 const loginAttempts = new Map(); // ip -> { count, firstAttempt }
+<<<<<<< HEAD
+=======
 
+>>>>>>> Carbonell
 
 // --- MIDDLEWARE ---
 app.disable("x-powered-by"); // don't advertise that we run Express
@@ -140,6 +157,8 @@ function readQuestions() {
     return readData(QUESTIONS_FILE);
 }
 
+<<<<<<< HEAD
+=======
 // Checks the fields of a new/edited question -> { fields } or { error }.
 // partial: true for edits, where only the fields being changed are sent.
 function readQuestionFields(body, { partial = false } = {}) {
@@ -163,6 +182,7 @@ function readQuestionFields(body, { partial = false } = {}) {
     return { fields };
 }
 
+>>>>>>> Carbonell
 // Scores { questionId: "yes" | "no" } against the current questions.
 // The server does the scoring, so the browser can't send a fake score.
 function scoreAnswers(questions, answers) {
@@ -273,6 +293,8 @@ function queryText(value) {
     return value.trim();
 }
 
+<<<<<<< HEAD
+=======
 // ?page=2&limit=10 -> { page, limit } or { error }
 function readPaging(query) {
     const page = query.page === undefined ? 1 : Number(query.page);
@@ -293,6 +315,7 @@ function paginate(items, { page, limit }) {
     };
 }
 
+>>>>>>> Carbonell
 // ?status=new&q=router -> { items } or { error }
 function filterMessages(query) {
     const status = queryText(query.status);
@@ -305,8 +328,12 @@ function filterMessages(query) {
     }
 
     const needle = search.toLowerCase();
+<<<<<<< HEAD
+    const items = readData(MESSAGES_FILE)
+=======
     // Reversed first, so records saved in the same millisecond still come out newest first
     const items = readData(MESSAGES_FILE).reverse()
+>>>>>>> Carbonell
         .filter(m => !status || (m.status || "new") === status)
         .filter(m => !needle || [m.name, m.email, m.subject, m.message]
             .some(field => String(field || "").toLowerCase().includes(needle)))
@@ -334,8 +361,12 @@ function filterResults(query) {
     const toTime = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
     if (fromTime > toTime) return { error: "The from date must be on or before the to date." };
 
+<<<<<<< HEAD
+    const items = readData(RESULTS_FILE)
+=======
     // Reversed first, so records saved in the same millisecond still come out newest first
     const items = readData(RESULTS_FILE).reverse()
+>>>>>>> Carbonell
         .filter(r => !riskLevel || r.riskLevel === riskLevel)
         .filter(r => {
             const time = recordTime(r);
@@ -370,6 +401,9 @@ function localDateKey(date) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+<<<<<<< HEAD
+// --- LOGIN LOCKOUT ---
+=======
 // --- ADMIN ACCOUNTS ---
 
 // Hash of a random password, checked when someone logs in with a username
@@ -417,6 +451,7 @@ function currentAdmin(req) {
     if (admin.passwordChangedAt && req.session.loginAt < Date.parse(admin.passwordChangedAt)) return null;
     return admin;
 }
+>>>>>>> Carbonell
 
 function isLockedOut(ip) {
     const entry = loginAttempts.get(ip);
@@ -437,6 +472,11 @@ function recordFailedLogin(ip) {
     }
 }
 
+<<<<<<< HEAD
+// Only let logged-in admins through
+function requireAdmin(req, res, next) {
+    if (req.session.isAdmin) return next();
+=======
 // Any logged-in admin, even one who still has to change their password
 // (used only for the change-password page and the API it needs)
 function requireLogin(req, res, next) {
@@ -445,6 +485,7 @@ function requireLogin(req, res, next) {
         req.admin = admin;
         return next();
     }
+>>>>>>> Carbonell
     if (req.path.startsWith("/api/")) {
         return res.status(401).json({ error: "Please log in." });
     }
@@ -482,12 +523,24 @@ app.get("/change-password", requireLogin, (req, res) => {
 });
 
 // --- AUTHENTICATION ---
+<<<<<<< HEAD
+app.post("/login", (req, res) => {
+=======
 app.post("/login", async (req, res) => {
+>>>>>>> Carbonell
     const ip = req.ip;
     if (isLockedOut(ip)) {
         return res.status(429).json({ error: "Too many failed attempts. Please try again in 15 minutes." });
     }
 
+<<<<<<< HEAD
+    const password = String(req.body.password || "");
+    if (password !== ADMIN_PASSWORD) {
+        recordFailedLogin(ip);
+        return res.status(401).json({ error: "Wrong password." });
+    }
+    loginAttempts.delete(ip);
+=======
     const { username, password } = req.body;
     if (typeof username !== "string" || !username.trim() || typeof password !== "string" || !password) {
         return res.status(400).json({ error: "Please enter your username and password." });
@@ -512,6 +565,7 @@ app.post("/login", async (req, res) => {
         record.lastLoginAt = new Date(now).toISOString();
         accounts.writeAdmins(all);
     }
+>>>>>>> Carbonell
 
     req.session.regenerate(err => {
         if (err) return res.status(500).json({ error: "Login failed." });
@@ -662,6 +716,16 @@ app.get("/api/messages/export", requireAdmin, (req, res) => {
         filtered.items.map(m => [m.date, m.name, m.email, m.subject, m.message, m.status || "new"]));
 });
 
+// Same filters as the list, every matching row, as a CSV download
+app.get("/api/messages/export", requireAdmin, (req, res) => {
+    const filtered = filterMessages(req.query);
+    if (filtered.error) return res.status(400).json({ error: filtered.error });
+
+    sendCsv(res, "messages",
+        ["Date", "Name", "Email", "Subject", "Message", "Status"],
+        filtered.items.map(m => [m.date, m.name, m.email, m.subject, m.message, m.status || "new"]));
+});
+
 app.patch("/api/messages/:id", requireAdmin, (req, res) => {
     const { status } = req.body;
     if (!["new", "resolved"].includes(status)) return res.status(400).json({ error: "Invalid status." });
@@ -684,16 +748,55 @@ app.delete("/api/messages/:id", requireAdmin, (req, res) => {
     res.json({ message: "Message deleted." });
 });
 
+<<<<<<< HEAD
+// --- BACKEND FEATURE 2: Assessment Results ---
+
+// Body: { "answers": { "q1": "yes", "q2": "no", ... } }
+// The server scores the answers, saves them, and sends back the result.
+app.post("/save-result", (req, res) => {
+    const questions = readQuestions();
+    if (questions.length === 0) return res.status(503).json({ error: "The assessment has no questions yet." });
+
+    const scored = scoreAnswers(questions, req.body.answers);
+    if (scored.error) return res.status(400).json({ error: scored.error });
+
+    const results = readData(RESULTS_FILE);
+    const id = crypto.randomUUID();
+    results.push({
+        id,
+        riskLevel: scored.riskLevel,
+        score: scored.score,
+        total: scored.total,
+        answers: scored.answers,
+        checklist: scored.checklist,
+        date: new Date().toLocaleString(),
+        createdAt: new Date().toISOString()
+    });
+    writeData(RESULTS_FILE, results);
+
+    // The id lets the user come back to this result later at /result?id=...
+    res.json({
+        message: "Assessment saved successfully!",
+        id,
+        riskLevel: scored.riskLevel,
+        score: scored.score,
+        total: scored.total,
+        checklist: scored.checklist
+    });
+=======
 // --- BACKEND FEATURE 2: Assessment questions ---
 
 // Public: what the assessment page shows (no answers or fixes)
 app.get("/api/questions", (req, res) => {
     res.json(readQuestions().map(({ id, text }) => ({ id, text })));
+>>>>>>> Carbonell
 });
 
 // Admin: everything, for the question editor
 app.get("/api/questions/full", requireAdmin, (req, res) => res.json(readQuestions()));
 
+<<<<<<< HEAD
+=======
 app.post("/api/questions", requireAdmin, (req, res) => {
     const questions = readQuestions();
     if (questions.length >= MAX_QUESTIONS) {
@@ -796,6 +899,7 @@ app.get("/api/results", requireAdmin, (req, res) => {
     res.json(paginate(filtered.items, paging));
 });
 
+>>>>>>> Carbonell
 // Same filters as the list, every matching row, as a CSV download.
 // (Must come before /api/results/:id, or "export" would be read as an id.)
 app.get("/api/results/export", requireAdmin, (req, res) => {
@@ -907,6 +1011,9 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Something went wrong on the server." });
 });
 
+<<<<<<< HEAD
+app.listen(PORT, () => console.log(`NetGuard backend running on port ${PORT}`));
+=======
 // Set up the admin accounts first, then start taking requests
 ensureFirstAdmin()
     .then(() => {
@@ -919,3 +1026,4 @@ ensureFirstAdmin()
         console.error("Fix or remove admins.json, or reset an account with: npm run admin -- reset-password <username>");
         process.exit(1);
     });
+>>>>>>> Carbonell

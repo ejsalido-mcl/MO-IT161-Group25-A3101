@@ -4,10 +4,15 @@
   "description": "",
   "main": "script.js",
   "scripts": {
+<<<<<<< HEAD
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+=======
     "test": "node --test \"test/*.test.js\"",
     "start": "node app.js",
     "admin": "node manage-admins.js",
     "test:report": "node --test --test-reporter=spec --test-reporter-destination=stdout --test-reporter=spec --test-reporter-destination=docs/test-results.txt \"test/*.test.js\""
+>>>>>>> Carbonell
   },
   "repository": {
     "type": "git",

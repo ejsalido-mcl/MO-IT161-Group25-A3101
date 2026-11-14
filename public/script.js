@@ -95,6 +95,24 @@ if (assessmentForm && questionsContainer) {
     assessmentForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
+<<<<<<< HEAD
+        const totalQuestions = 10;
+        const answers = {};
+        const missing = [];
+
+        for (let i = 1; i <= totalQuestions; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (!selected) {
+                missing.push(i);
+            } else {
+                answers[`q${i}`] = selected.value;
+            }
+        }
+
+        if (missing.length > 0) {
+            alert("Please answer all questions before submitting.");
+            console.log("Missing questions:", missing);
+=======
         const answers = {};
         let firstMissing = null;
         questionsContainer.querySelectorAll(".question").forEach(fieldset => {
@@ -108,12 +126,19 @@ if (assessmentForm && questionsContainer) {
             const left = questions.length - Object.keys(answers).length;
             showFormError(`Please answer all questions (${left} left).`);
             firstMissing.scrollIntoView({ behavior: "smooth", block: "center" });
+>>>>>>> Carbonell
             return;
         }
         errorBox.style.display = "none";
         submitButton.disabled = true;
         submitButton.textContent = "Calculating...";
 
+<<<<<<< HEAD
+        const submitButton = assessmentForm.querySelector("button");
+        submitButton.disabled = true;
+
+=======
+>>>>>>> Carbonell
         // The server scores the answers and saves the result
         fetch("/save-result", {
             method: "POST",
@@ -125,17 +150,29 @@ if (assessmentForm && questionsContainer) {
             return data;
         }))
         .then(data => {
+<<<<<<< HEAD
+            showResults(data.riskLevel, data.checklist, data.score);
+            showShareLink(data.id);
+        })
+        .catch(error => {
+            console.error("Error saving to backend:", error);
+            alert(error instanceof TypeError
+=======
             showResults(data);
             showShareLink(data.id);
         })
         .catch(error => {
             showFormError(error instanceof TypeError
+>>>>>>> Carbonell
                 ? "Could not reach the server. Please check your connection and try again."
                 : error.message);
         })
         .finally(() => {
             submitButton.disabled = false;
+<<<<<<< HEAD
+=======
             submitButton.textContent = "Calculate My Risk Score";
+>>>>>>> Carbonell
         });
     });
 }
@@ -189,10 +226,22 @@ const savedResult = document.getElementById("saved-result");
 if (savedResult) {
     const id = new URLSearchParams(window.location.search).get("id");
     const statusEl = document.getElementById("saved-status");
+<<<<<<< HEAD
+    const summaries = {
+        Low: "Your Wi-Fi setup is fairly secure.",
+        Medium: "Some settings could be improved.",
+        High: "Your network may be vulnerable."
+    };
+
+    const showError = message => {
+        statusEl.textContent = message;
+        statusEl.className = "error-text";
+=======
 
     const showError = message => {
         statusEl.textContent = message;
         statusEl.className = "alert alert-warning";
+>>>>>>> Carbonell
     };
 
     if (!id) {
@@ -203,6 +252,28 @@ if (savedResult) {
             .then(({ ok, data }) => {
                 if (!ok) return showError(data.error || "This result could not be found.");
 
+<<<<<<< HEAD
+                const levelEl = document.getElementById("saved-level");
+                levelEl.textContent = `Risk Level: ${data.riskLevel}`;
+                levelEl.className = `risk-${String(data.riskLevel).toLowerCase()}`;
+                document.getElementById("saved-summary").textContent =
+                    `You scored ${data.score}/${data.total}. ${summaries[data.riskLevel] || ""}`;
+                document.getElementById("saved-date").textContent = `Taken on ${data.date}`;
+
+                // checklist is null for results saved before answers were stored
+                let items = data.checklist;
+                if (items === null) items = ["This result was saved before NetGuard stored individual answers, so its checklist isn't available."];
+                else if (items.length === 0) items = ["Nothing to fix — your setup looks great!"];
+
+                const listEl = document.getElementById("saved-checklist");
+                listEl.innerHTML = "";
+                items.forEach(text => {
+                    const li = document.createElement("li");
+                    li.textContent = text;
+                    listEl.appendChild(li);
+                });
+
+=======
                 fillResult({
                     level: document.getElementById("saved-level"),
                     summary: document.getElementById("saved-summary"),
@@ -210,6 +281,7 @@ if (savedResult) {
                 }, data);
                 document.getElementById("saved-date").textContent = `Taken on ${data.date}`;
 
+>>>>>>> Carbonell
                 statusEl.style.display = "none";
                 savedResult.style.display = "block";
             })
@@ -597,11 +669,154 @@ if (messagesContainer) {
     });
 }
 
+<<<<<<< HEAD
+// ----- Overview: stats cards and charts (numbers come from /api/stats) -----
+const trendChart = document.getElementById("trend-chart");
+const failedChart = document.getElementById("failed-chart");
+
+// One floating tooltip shared by every chart mark with a data-tip attribute
+// (admin dashboard only)
+const chartTooltip = document.createElement("div");
+chartTooltip.className = "chart-tooltip";
+chartTooltip.setAttribute("role", "tooltip");
+
+if (statsContainer) {
+    document.body.appendChild(chartTooltip);
+    document.addEventListener("mouseover", event => {
+        const target = event.target.closest("[data-tip]");
+        if (target) showChartTip(target); else hideChartTip();
+    });
+    document.addEventListener("focusin", event => {
+        const target = event.target.closest("[data-tip]");
+        if (target) showChartTip(target); else hideChartTip();
+    });
+    document.addEventListener("focusout", hideChartTip);
+}
+=======
 // ----- Assessment history -----
 
 const resultsContainer = document.getElementById("results-container");
+>>>>>>> Carbonell
+
+function showChartTip(target) {
+    chartTooltip.textContent = target.dataset.tip;
+    chartTooltip.style.display = "block";
+    const box = target.getBoundingClientRect();
+    const tipWidth = chartTooltip.offsetWidth;
+    const left = Math.min(
+        Math.max(8, box.left + box.width / 2 - tipWidth / 2),
+        document.documentElement.clientWidth - tipWidth - 8
+    );
+    chartTooltip.style.left = `${left + window.scrollX}px`;
+    chartTooltip.style.top = `${box.top + window.scrollY - chartTooltip.offsetHeight - 8}px`;
+}
+function hideChartTip() {
+    chartTooltip.style.display = "none";
+}
+
+// "2026-11-09" -> Date at local midnight
+function parseDay(key) {
+    const [y, m, d] = key.split("-").map(Number);
+    return new Date(y, m - 1, d);
+}
+
+// Column chart: assessments per day for the last 14 days
+function renderTrendChart(days) {
+    const total = days.reduce((sum, d) => sum + d.count, 0);
+    const shortDate = key => parseDay(key).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    document.getElementById("trend-caption").textContent =
+        `${shortDate(days[0].date)} – ${shortDate(days[days.length - 1].date)} · ${total} assessment${total === 1 ? "" : "s"}`;
+
+    const max = Math.max(...days.map(d => d.count));
+    const top = Math.max(1, max);
+    const longDate = key => parseDay(key).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+
+    const columns = days.map(d => {
+        const tip = `${longDate(d.date)}: ${d.count} assessment${d.count === 1 ? "" : "s"}`;
+        const height = (d.count / top) * 100;
+        // Label only the busiest day, so the chart stays uncluttered
+        const label = d.count > 0 && d.count === max ? `<span class="trend-value">${d.count}</span>` : "";
+        return `<div class="trend-col" tabindex="0" data-tip="${escapeHTML(tip)}" aria-label="${escapeHTML(tip)}">
+                    ${label}<div class="trend-bar" style="height: ${height}%"></div>
+                </div>`;
+    }).join("");
+
+    // Day-of-month under each bar (the caption above gives the months)
+    const labels = days.map((d, i) =>
+        `<span class="${i % 2 ? "trend-label-odd" : ""}">${parseDay(d.date).getDate()}</span>`
+    ).join("");
+
+    // Same numbers as a table for screen readers
+    const tableRows = days.map(d => `<tr><td>${escapeHTML(longDate(d.date))}</td><td>${d.count}</td></tr>`).join("");
+
+    trendChart.innerHTML = `
+        <div class="trend-plot">
+            <div class="trend-axis"><span>${top}</span><span>0</span></div>
+            <div class="trend-area">
+                <div class="trend-bars">${columns}</div>
+                <div class="trend-labels" aria-hidden="true">${labels}</div>
+            </div>
+        </div>
+        <table class="visually-hidden"><caption>Assessments per day, last 14 days</caption>
+            <thead><tr><th>Day</th><th>Assessments</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+}
+
+// Horizontal bars: the questions people most often answer unsafely
+function renderFailedChart(questionStats) {
+    const withData = questionStats.filter(q => q.answered > 0);
+    if (withData.length === 0) {
+        failedChart.innerHTML = '<p class="placeholder">No answers saved yet. This fills in as people take the assessment.</p>';
+        return;
+    }
+    const top5 = withData.slice(0, 5);
+    failedChart.innerHTML = `<ol class="hbar-list">${top5.map(q => {
+        const tip = `${q.failed} of ${q.answered} answered unsafely (${q.failRate}%)`;
+        return `<li class="hbar-row" tabindex="0" data-tip="${escapeHTML(tip)}">
+            <span class="hbar-label">${escapeHTML(q.text)}</span>
+            <span class="hbar-line">
+                <span class="hbar-fill" style="width: ${q.failRate}%"></span>
+                <span class="hbar-value">${q.failRate}%</span>
+            </span>
+        </li>`;
+    }).join("")}</ol>`;
+}
+
+function loadStats() {
+    if (!statsContainer) return;
+    adminFetch("/api/stats").then(stats => {
+        const a = stats.assessments;
+        const card = (value, label, extraClass = "") =>
+            `<div class="stat-card"><span class="stat-number ${extraClass}">${escapeHTML(value)}</span><span class="stat-label">${label}</span></div>`;
+
+        statsContainer.innerHTML =
+            card(a.total, "Assessments taken") +
+            card(a.averagePercent === null ? "—" : `${a.averagePercent}%`, "Average score") +
+            card(a.byLevel.Low, "Low risk", "risk-low") +
+            card(a.byLevel.Medium, "Medium risk", "risk-medium") +
+            card(a.byLevel.High, "High risk", "risk-high") +
+            card(stats.messages.new, "New messages");
+
+        if (trendChart) renderTrendChart(a.last14Days);
+        if (failedChart) renderFailedChart(stats.questions);
+    }).catch(error => {
+        if (error.message !== "Not logged in") statsContainer.innerHTML = "<p>Could not load stats.</p>";
+    });
+}
+
+loadStats();
 
 if (resultsContainer) {
+<<<<<<< HEAD
+    adminFetch("/api/results").then(results => {
+        if (results.length === 0) {
+            resultsContainer.innerHTML = "<p>No assessments taken yet.</p>";
+            return;
+        }
+        let html = "<table><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr>";
+        results.forEach(result => {
+            const level = escapeHTML(result.riskLevel);
+            html += `<tr><td>${escapeHTML(result.date)}</td><td class="risk-${level.toLowerCase()}">${level}</td><td>${escapeHTML(result.score)}/${escapeHTML(result.total || 10)}</td></tr>`;
+=======
     setupAdminList({
         endpoint: "/api/results",
         form: document.getElementById("results-filters"),
@@ -710,6 +925,7 @@ if (questionsAdmin) {
             if (error.message === "Not logged in") return;
             formError.textContent = error.message;
             formError.style.display = "block";
+>>>>>>> Carbonell
         });
     });
 
